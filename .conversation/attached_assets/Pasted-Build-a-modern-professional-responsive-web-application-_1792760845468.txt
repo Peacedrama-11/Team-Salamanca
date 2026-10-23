@@ -1,0 +1,332 @@
+Build a modern, professional, responsive web application called FuturePath AI. This is a hackathon prototype for an AI-powered future workforce and career development platform.
+
+I am a beginner, so build the application for me, ensure it runs, and keep the code organised and easy to understand. Do not only give me instructions or a static design. Create the actual working application.
+
+1. Technology and architecture
+
+Use React, TypeScript, and Tailwind CSS for a polished, modern dashboard. Use a suitable backend architecture if required. Keep the project structured so that real authentication, databases, AI models, job-market APIs, and learning-resource APIs can be integrated later.
+
+For this first version, use realistic, clearly labelled DEMO DATA. Do not require API keys or paid services to run the initial prototype.
+
+2. Public landing page
+
+Create an attractive landing page with:
+
+FuturePath AI branding and a professional navigation bar.
+
+A strong headline: "Your Future. Your Skills. Your Path."
+
+A short description explaining how the platform helps people navigate AI-driven changes in the workforce.
+
+A dashboard preview featuring career opportunities, future skills, and SDG impact.
+
+A section explaining the four user types.
+
+A section showcasing the United Nations Sustainable Development Goals (SDGs).
+
+Sign In and Get Started buttons.
+
+Display a prominent dashboard section called "High-Demand Careers". Show sample occupations, industry categories, demand indicators, required skills, and possible career pathways. Include country or region filters.
+
+Since live job-market data has not been connected yet, label the career data as illustrative demo data. Do not claim that sample numbers represent real-time demand or verified forecasts.
+
+3. Authentication interface
+
+Create a sign-in and registration page with:
+
+Continue with Google button.
+
+Email and password fields.
+
+Sign in and create account options.
+
+Forgot password link.
+
+A user-friendly design and validation messages.
+
+Prepare the application for real Google OAuth authentication later. Do not pretend that Google authentication is working before it is configured. For now, provide a clearly labelled demo mode so I can test the different user dashboards without real credentials.
+
+Keep authentication logic separate from the interface so a proper authentication provider can be connected later.
+
+4. User-type selection and navigation
+
+During onboarding, ask users to select one of four account types:
+
+A. Student
+B. Fresh Graduate
+C. Working Adult
+D. HR / Learning and Development Manager
+
+Each user type must have its own dashboard, navigation menu, forms, and relevant features. After selecting a role, route the user to the corresponding dashboard. Provide a way to return to the main dashboard and a sign-out interface.
+
+5. Student dashboard
+
+Create a personalised dashboard for students.
+
+Include an onboarding form with:
+
+Full name or display name.
+
+University or educational institution.
+
+Course or field of study.
+
+Current year of study.
+
+Skills and technical competencies.
+
+Interests and preferred industries.
+
+Current location and country of residence.
+
+Countries where the student is willing to study, intern, or work.
+
+Preferred career direction.
+
+Whether the student wants an internship, graduate preparation, or a general study plan.
+
+Preferred learning duration and available weekly study hours.
+
+After submitting, show a student dashboard with:
+
+Recommended internship and entry-level career categories using demo data.
+
+A skills-gap summary.
+
+A personalised study or internship preparation roadmap.
+
+Recommended skills to learn, arranged in order.
+
+Learning-resource placeholders with estimated completion times.
+
+Career opportunities filtered by preferred country.
+
+SDG impact associated with recommended career paths.
+
+Include progress tracking for the learning plan.
+
+6. Fresh graduate dashboard
+
+Create a dedicated dashboard for fresh graduates.
+
+Include:
+
+CV upload interface supporting PDF and DOCX files.
+
+Preferred job roles and industries.
+
+Current location and preferred countries for employment.
+
+Skills, qualifications, experience, and career interests.
+
+Salary expectations as an optional field.
+
+Career transition or job-readiness goals.
+
+For this prototype, implement the upload interface and appropriate file validation. Clearly indicate that automatic CV analysis will be connected later. Do not pretend to extract CV information using AI when no AI processing has been implemented.
+
+Show a sample results page containing:
+
+Potential job matches.
+
+An explainable career match score.
+
+Skills already possessed and missing skills.
+
+Recommended reskilling pathway.
+
+Future career scenarios.
+
+Country-specific opportunity categories.
+
+SDG impact for each recommended career.
+
+7. Working adult dashboard
+
+Create a dashboard for working adults who want to progress in their careers or change industries.
+
+Include:
+
+CV upload interface.
+
+Current occupation and industry.
+
+Current skills and years of experience.
+
+Preferred future roles.
+
+Current and preferred employment countries.
+
+Career goals, available learning hours, and learning budget.
+
+Show:
+
+Career advancement recommendations.
+
+Transferable skills.
+
+Alternative careers that use existing skills.
+
+Skills gaps for each target role.
+
+A reskilling roadmap with ordered learning steps.
+
+Estimated time required for each step.
+
+Moderate and fast AI-disruption scenarios.
+
+An alternative career pathway if the user's current role changes significantly.
+
+SDG impact associated with recommended career options.
+
+Create a distinctive feature called "Career Crash Test" that compares how career options and skill priorities could differ across two hypothetical AI-adoption scenarios. Clearly label all scenarios as illustrative estimates, not validated predictions.
+
+8. HR / Learning and Development Manager dashboard
+
+Build a professional workforce management dashboard designed for companies.
+
+Include a main overview with demo metrics such as:
+
+Total employees in the sample organisation.
+
+Skills coverage.
+
+Employees with identified skill gaps.
+
+Reskilling plans in progress.
+
+Internal mobility opportunities.
+
+Include these modules:
+
+A. Candidate Discovery
+
+Search and filter synthetic candidate profiles by skills, job family, location, experience, and preferred role.
+
+Display candidate cards with skills, qualifications, location, and explainable role-match scores.
+
+Include a candidate profile details page.
+
+Use fictional candidate data only.
+
+B. Workforce Skills Intelligence
+
+Show a team skills matrix.
+
+Identify skills that the team has and skills that may need development.
+
+Display illustrative future skill-demand indicators.
+
+Filter by team, department, and job family.
+
+C. Employee Management
+
+Add an employee or import a sample employee list.
+
+Create employee profiles with roles, skills, departments, and career goals.
+
+Allow an employee to be assigned a reskilling pathway.
+
+Provide edit and remove actions in demo mode.
+
+D. AI Reskilling Planner
+
+Let an HR manager select one or more employees or a team.
+
+Choose a target role or skill.
+
+Generate a demo reskilling plan containing skill gaps, learning steps, estimated duration, and relevant learning resources.
+
+Track plan status, such as Not Started, In Progress, and Completed.
+
+E. SDG and Impact Dashboard
+
+Show how selected roles, skills, and training initiatives connect to relevant UN SDGs.
+
+Display the SDG number, official goal title, explanation of the connection, and a suggested impact indicator.
+
+Do not claim measurable SDG outcomes without evidence.
+
+Make the HR dashboard feel like a workforce intelligence platform rather than a student career page.
+
+9. Shared career and SDG features
+
+Every user type should be able to access relevant versions of:
+
+Career exploration.
+
+Skill-gap analysis.
+
+Learning pathways.
+
+Future career scenarios.
+
+SDG impact mapping.
+
+Create an SDG directory using the official 17 United Nations Sustainable Development Goals. For each career recommendation, show the relevant SDG numbers, official titles, and an explanation of the connection. Make it clear that the connection represents potential contribution, not proof of impact.
+
+10. Design and user experience
+
+Use a premium SaaS-style design:
+
+Clean typography and generous spacing.
+
+Professional dark navy, white, and teal accents.
+
+Sidebar navigation for authenticated dashboards.
+
+Cards, charts, progress bars, tables, filters, and clear status indicators.
+
+Responsive desktop, tablet, and mobile layouts.
+
+Consistent styling across every user type.
+
+Helpful empty states, validation, loading states, and success messages.
+
+Avoid a generic school-project appearance. The landing page should feel like a real technology startup product.
+
+11. Demo data and future integrations
+
+Use synthetic profiles and clearly labelled illustrative career data. Keep sample data in separate files or modules so it can later be replaced by real data.
+
+Prepare clearly separated modules or service interfaces for future integration of:
+
+Live job-market and AI-trend data sources.
+
+Career and skill recommendation logic.
+
+AI-powered CV analysis.
+
+Google OAuth and user authentication.
+
+Persistent database storage.
+
+Learning-resource APIs.
+
+Future career scenario modelling.
+
+For future data integrations, retain source names, publication dates, retrieval dates, and links where applicable. Do not present news coverage as direct proof of hiring demand.
+
+12. Important implementation requirements
+
+All navigation links, buttons, filters, forms, and dashboard interactions should work in demo mode.
+
+Each user type must lead to the correct dedicated dashboard.
+
+Use fictional employee and candidate profiles.
+
+Do not expose private information in public pages.
+
+Do not store uploaded CVs or sensitive employee information in browser local storage.
+
+Do not hardcode secrets or API keys into the source code.
+
+Do not build fake AI functionality that claims to analyse files or generate verified predictions.
+
+Include clear demo-data labels wherever appropriate.
+
+Create a README with setup instructions.
+
+Ensure the application starts successfully and fix errors before finishing.
+
+Start by building the complete end-to-end user interface and working demo flows. Prioritise the public landing page, demo sign-in, role selection, four separate dashboards, career opportunity cards, and SDG mapping. After implementing these, explain how to run and test the application and which integrations remain unconfigured.

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Futurique"
+description = "An AI-era career and workforce development platform with role-based demo dashboards for students, graduates, working adults, and HR teams."
+version = "1.0.0"
+id = "artifacts/futurique"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21740
+
+[services.development]
+run = "pnpm --filter @workspace/futurique run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/futurique", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/futurique/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21740"
+BASE_PATH = "/"

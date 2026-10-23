@@ -1,6 +1,6 @@
-# [Project name]
+# Futurique
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A demo career development and workforce intelligence platform for navigating AI-driven changes to work.
 
 ## Run & Operate
 
@@ -22,19 +22,23 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/futurique/` — user-facing web application
+- `artifacts/futurique/src/` — app routes, components, and theme
+- `artifacts/futurique/README.md` — setup and demo limitations
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- First release uses session-only synthetic demo data; no database or external API is required to run the prototype.
+- Uploaded CVs must remain local to the active session and are not uploaded, read, or analyzed.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Futurique supports students, fresh graduates, working adults, and HR / L&D managers with career exploration, skill-gap views, learning pathways, illustrative future scenarios, and potential SDG contribution mapping.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Product name: Futurique.
+- Theme colors: black, dark blue, and white.
 
 ## Gotchas
 
