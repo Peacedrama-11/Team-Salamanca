@@ -290,6 +290,50 @@ td strong { color:#1c2a40; }
 .sdg-card p { color:#778396; font-size:10px; line-height:1.55; margin:0; }
 .empty-state { border:1px dashed #d4dde7; border-radius:10px; padding:30px 18px; text-align:center; color:#748196; font-size:12px; }
 .mobile-menu { display:none; }
+.skills-achievements { display:grid; gap:14px; }
+.skill-summary-panel,.roadmap-achievements,.records-panel,.manual-record-panel { box-shadow:0 5px 18px rgba(18,35,60,.025); }
+.skill-summary-panel .panel-head,.roadmap-achievements .panel-head,.records-panel .panel-head { margin-bottom:15px; }
+.skill-summary-panel .eyebrow,.roadmap-achievements .eyebrow,.records-panel .eyebrow,.catalog-heading .eyebrow { margin-bottom:7px; }
+.skill-summary-panel h2,.roadmap-achievements h2,.records-panel h2,.manual-record-panel h2 { font-size:16px; margin:0 0 5px; }
+.achievement-skill-list { display:flex; gap:8px; flex-wrap:wrap; }
+.achievement-skill { display:inline-flex; align-items:center; border:1px solid #d4e8ec; background:#edf8fa; color:#24566a; border-radius:99px; padding:8px 12px; font-size:11px; font-weight:700; }
+.milestone-list { display:grid; }
+.milestone-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #edf0f4; font-size:12px; color:#27374c; }
+.milestone-row:last-child { border:0; }
+.milestone-check { width:25px; height:25px; display:grid; place-items:center; flex:0 0 auto; border-radius:50%; background:#e8f6f7; color:#18839c; }
+.milestone-row .pill { margin-left:auto; }
+.catalog-section { border-radius:13px; padding:21px; background:#101d32; color:#f2f6fc; }
+.catalog-heading { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:18px; }
+.catalog-heading h2 { font-size:25px; margin:0 0 7px; line-height:1.1; }
+.catalog-heading p { margin:0; max-width:660px; color:#a9b8cc; font-size:11px; line-height:1.6; }
+.catalog-heading>svg { color:#65d5eb; flex:0 0 auto; }
+.course-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; }
+.course-card { padding:16px; border-radius:10px; border:1px solid #2a405d; background:#14243a; min-width:0; }
+.course-card-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.course-index { color:#7090aa; font:600 10px var(--app-font-mono); }
+.course-tag { color:#83dfed; background:#18384a; border-radius:99px; padding:5px 8px; font-size:9px; font-weight:700; }
+.course-card h3 { font-size:14px; margin:14px 0 6px; }
+.course-card>p { min-height:34px; color:#aab8ca; font-size:10px; line-height:1.55; margin:0; }
+.course-meta { display:grid; gap:6px; margin:14px 0; padding-top:11px; border-top:1px solid #2a3b53; color:#a2b2c6; font-size:9px; }
+.course-meta span { display:flex; align-items:center; gap:6px; }
+.course-meta svg { color:#70d2e5; }
+.course-card .small-btn { display:inline-flex; align-items:center; gap:6px; }
+.course-card .small-btn:disabled { cursor:default; color:#a7c8d0; background:#213848; border-color:#2c4d5b; }
+.achievement-record-list { display:grid; }
+.achievement-record { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #edf0f4; min-width:0; }
+.achievement-record:last-child { border:0; }
+.record-icon { width:34px; height:34px; border-radius:9px; display:grid; place-items:center; color:#167d94; background:#e9f7f9; flex:0 0 auto; }
+.record-info { display:grid; gap:4px; min-width:0; flex:1; }
+.record-info strong { color:#203047; font-size:11px; }
+.record-info span { color:#7c899a; font-size:9px; line-height:1.45; overflow-wrap:anywhere; }
+.record-info .record-status { color:#356679; font-weight:700; }
+.record-info .record-status.self-reported { color:#826526; }
+.record-submit-row { display:flex; align-items:center; justify-content:space-between; gap:15px; margin-top:8px; }
+.record-submit-row p { max-width:440px; color:#7c899a; font-size:10px; line-height:1.5; margin:0; }
+.record-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 14px; }
+.manual-record-panel .form-field label { color:#44536a; }
+.manual-record-panel .control { padding:10px 11px; }
+.record-submit-row .btn { flex:0 0 auto; }
 @media (max-width: 900px) {
  .hero { grid-template-columns:1fr; padding-top:70px; }.hero-visual { display:none; }
  .audience-grid,.role-grid { grid-template-columns:repeat(2,1fr); }
@@ -305,5 +349,6 @@ td strong { color:#1c2a40; }
  .auth-wrap { grid-template-columns:1fr; }.auth-aside { display:none; }.auth-card-wrap { min-height:100dvh; padding:24px; }
  .role-pick { padding:25px 20px; }.role-pick-head { margin-bottom:44px; }.role-grid { grid-template-columns:1fr; }.role-card { min-height:165px; }
  .dashboard { display:block; }.sidebar { display:none; }.dash-topbar { padding:0 17px; height:60px; }.dash-content { padding:23px 16px 40px; }.dash-heading { display:block; }.dash-heading .btn { margin-top:15px; }.stats-grid { grid-template-columns:repeat(2,1fr); gap:8px; }.stat-card { padding:14px; }.stat-value { font-size:23px; }.panel { padding:16px; }.sdg-grid { grid-template-columns:1fr 1fr; }
- .mobile-menu { display:flex; position:sticky; bottom:0; z-index:10; background:#0d1728; padding:8px 6px; justify-content:space-around; }.mobile-menu button { border:0; background:transparent; color:#a8b6c9; display:grid; place-items:center; font-size:8px; gap:4px; }.mobile-menu button.active { color:#66d5ed; }
+  .mobile-menu { display:flex; position:sticky; bottom:0; z-index:10; background:#0d1728; padding:8px 6px; justify-content:flex-start; overflow-x:auto; gap:5px; scrollbar-width:thin; }.mobile-menu button { border:0; background:transparent; color:#a8b6c9; display:grid; place-items:center; font-size:8px; gap:4px; flex:0 0 auto; min-width:64px; padding:4px 7px; }.mobile-menu button.active { color:#66d5ed; }
+  .course-grid { grid-template-columns:1fr; }.record-form-grid { grid-template-columns:1fr; }.catalog-section { padding:17px; }.record-submit-row { align-items:stretch; flex-direction:column; }.record-submit-row .btn { align-self:flex-start; }
 }

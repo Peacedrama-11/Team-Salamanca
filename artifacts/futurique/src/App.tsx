@@ -1,15 +1,22 @@
 import { useMemo, useState, type Dispatch, type FormEvent, type ReactNode, type SetStateAction } from 'react';
 import { Link, Route, Switch, useLocation } from 'wouter';
 import {
-  ArrowRight, ArrowUpRight, BarChart3, BookOpen, BriefcaseBusiness, Check, ChevronDown,
+  ArrowRight, ArrowUpRight, Award, BarChart3, BookOpen, BookOpenCheck, BriefcaseBusiness, Check, ChevronDown,
   Compass, FileText, Globe2, GraduationCap, HeartHandshake, LayoutDashboard,
   Lightbulb, LogOut, Network, Plus, Search, Settings2, ShieldCheck, Sparkles,
-  Target, TrendingUp, UserRound, Users, X, Zap,
+  Target, TrendingUp, UserRound, Users, X, Zap, Clock3, Trash2,
 } from 'lucide-react';
 
 type Role = 'student' | 'graduate' | 'professional' | 'hr';
 type Employee = { id: number; name: string; role: string; team: string; skills: string[]; plan: string; status: string };
 type ProfileData = { name: string; field: string; country: string; goal: string; skills: string };
+type LearningRecord = { id: string; title: string; kind: 'Course'|'Certification'|'Other'|'Badge'; issuer: string; date: string; source: 'demo'|'self-reported'; catalogId?: string };
+const courseCatalog = [
+  { id:'ai-fluency', title:'AI fluency: useful foundations', duration:'About 2 hours', skill:'AI literacy', detail:'Explore common AI capabilities, limitations and responsible use.' },
+  { id:'data-stories', title:'Tell a story with data', duration:'About 3 hours', skill:'Data storytelling', detail:'Turn a small dataset into a clear, decision-ready explanation.' },
+  { id:'effective-prompts', title:'Effective AI use at work', duration:'About 90 minutes', skill:'Prompt design', detail:'Practise clear task framing, context and review of generated drafts.' },
+  { id:'data-foundations', title:'Everyday data foundations', duration:'About 2.5 hours', skill:'Data literacy', detail:'Build confidence reading tables, charts and everyday data.' },
+];
 const roleInfo: Record<Role, { title: string; label: string; intro: string; icon: typeof GraduationCap }> = {
   student: { title: 'Student', label: 'Student', intro: 'Build skills with a clear path from study to opportunity.', icon: GraduationCap },
   graduate: { title: 'Fresh graduate', label: 'Graduate', intro: 'Translate what you know into a confident next move.', icon: BriefcaseBusiness },
@@ -75,9 +82,14 @@ function Dashboard({ role }: { role:Role }) {
  const [profile,setProfile]=useState<ProfileData>({name:role==='hr'?'Morgan Ellis':'Alex Morgan', field:'Business analytics', country:'Singapore', goal:'Build practical data and digital skills', skills:'Communication, Excel, Research'});
  const [fileName,setFileName]=useState(''); const [fileMessage,setFileMessage]=useState('');
  const [roadmapDone,setRoadmapDone]=useState([true,false,false]);
+  const [learningRecords,setLearningRecords]=useState<LearningRecord[]>([
+    {id:'demo-ai',title:'AI at work essentials',kind:'Course',issuer:'Futurique demo catalog',date:'2025-02-12',source:'demo'},
+    {id:'demo-data',title:'Data foundations',kind:'Course',issuer:'Futurique demo catalog',date:'2025-01-28',source:'demo'},
+    {id:'demo-badge',title:'First steps in lifelong learning',kind:'Badge',issuer:'Futurique demo',date:'2025-01-28',source:'demo'},
+  ]);
  const [scenario,setScenario]=useState<'steady'|'accelerated'>('steady');
  const [notice,setNotice]=useState('');
- const navItems = role==='hr'?['Overview','Candidates','Skills matrix','Learning plans','Impact map']:['Overview','My profile','Career explorer','Learning roadmap',...(role==='graduate'?['CV & matches']:[]),...(role==='professional'?['Career Crash Test']:[])];
+  const navItems = role==='hr'?['Overview','Skills & achievements','Candidates','Skills matrix','Learning plans','Impact map']:['Overview','Skills & achievements','My profile','Career explorer','Learning roadmap',...(role==='graduate'?['CV & matches']:[]),...(role==='professional'?['Career Crash Test']:[])];
  const visibleEmployees=useMemo(()=>employees.filter(e=>(!query||`${e.name} ${e.role} ${e.team} ${e.skills.join(' ')}`.toLowerCase().includes(query.toLowerCase()))&&(skillFilter==='All skills'||e.skills.some(s=>s.toLowerCase().includes(skillFilter.toLowerCase())))),[employees,query,skillFilter]);
  const notify=(msg:string)=>{setToast(msg);window.setTimeout(()=>setToast(''),2800);};
  const openEmployee=(e?:Employee)=>{setEditing(e||null);setEmployeeName(e?.name||'');setEmployeeRole(e?.role||'');setEmployeeTeam(e?.team||'');setEmployeeSkills(e?.skills.join(', ')||'');setModal('employee');};
@@ -85,7 +97,7 @@ function Dashboard({ role }: { role:Role }) {
  const changePlan=(id:number,plan:string)=>setEmployees(employees.map(e=>e.id===id?{...e,plan,status:plan==='No plan'?'Not started':'Assigned'}:e));
  const signOut=()=>setLocation('/');
  const chooseTab=(name:string)=>{setTab(name);setNotice('');};
- const sidebarIcon=(name:string)=>name==='Overview'?<LayoutDashboard size={16}/>:name==='Candidates'?<Search size={16}/>:name==='Skills matrix'?<BarChart3 size={16}/>:name==='Learning plans'?<BookOpen size={16}/>:name==='Impact map'?<HeartHandshake size={16}/>:name==='My profile'?<UserRound size={16}/>:name==='Career explorer'?<Compass size={16}/>:name==='Learning roadmap'?<BookOpen size={16}/>:name==='CV & matches'?<FileText size={16}/>:<Zap size={16}/>;
+  const sidebarIcon=(name:string)=>name==='Overview'?<LayoutDashboard size={16}/>:name==='Skills & achievements'?<Award size={16}/>:name==='Candidates'?<Search size={16}/>:name==='Skills matrix'?<BarChart3 size={16}/>:name==='Learning plans'?<BookOpen size={16}/>:name==='Impact map'?<HeartHandshake size={16}/>:name==='My profile'?<UserRound size={16}/>:name==='Career explorer'?<Compass size={16}/>:name==='Learning roadmap'?<BookOpen size={16}/>:name==='CV & matches'?<FileText size={16}/>:<Zap size={16}/>;
  const title=tab==='Overview'?'Your career, in focus':tab;
  return <div className="dashboard">
   <aside className="sidebar"><div className="side-brand"><Link href="/" data-testid="link-dashboard-home"><Brand/></Link></div><div className="sidebar-label">{roleInfo[role].label} workspace</div><nav className="side-nav">{navItems.map(item=><button key={item} onClick={()=>chooseTab(item)} className={tab===item?'active':''} data-testid={`nav-${item.toLowerCase().replaceAll(' ','-')}`}>{sidebarIcon(item)}<span>{item}</span></button>)}</nav><div className="side-bottom"><div className="side-nav"><button onClick={()=>setLocation('/onboarding')} data-testid="button-switch-role"><Settings2 size={16}/><span>Switch experience</span></button><button onClick={signOut} data-testid="button-sign-out"><LogOut size={16}/><span>Sign out</span></button></div></div></aside>
@@ -93,14 +105,64 @@ function Dashboard({ role }: { role:Role }) {
    <div className="dash-content"><div className="dash-heading"><div><div className="eyebrow">{roleInfo[role].label} workspace</div><h1 className="display">{title}</h1><p>{tab==='Overview'?roleInfo[role].intro:`Explore ${tab.toLowerCase()} with fictional, session-only demo data.`}</p></div>{role==='hr'&&tab==='Candidates'&&<Button onClick={()=>setModal('candidate')} kind="dark" testId="button-discover-candidates"><Search size={14}/> Discover candidates</Button>}</div>
    {role==='graduate'&&tab==='CV & matches'&&<div className="notice warning" data-testid="status-cv-demo">CV matching is illustrative only. File selection is validated in your browser; no upload, extraction or storage occurs. CV analysis is not configured.</div>}
    {notice&&<div className="notice" role="status" data-testid="status-inline">{notice}</div>}
-   {tab==='Overview'?<Overview role={role} employees={employees} setTab={chooseTab} setNotice={setNotice}/>:tab==='My profile'?<Profile profile={profile} setProfile={setProfile} notify={notify}/>:tab==='Career explorer'?<CareerExplorer region={region} setRegion={setRegion} country={country} setCountry={setCountry}/>:tab==='Learning roadmap'?<Roadmap done={roadmapDone} setDone={setRoadmapDone} notify={notify}/>:tab==='CV & matches'?<Graduate profile={profile} setProfile={setProfile} fileName={fileName} fileMessage={fileMessage} setFileName={setFileName} setFileMessage={setFileMessage}/>:tab==='Career Crash Test'?<CrashTest scenario={scenario} setScenario={setScenario}/>:tab==='Candidates'?<Candidates query={query} setQuery={setQuery} region={region} setRegion={setRegion} candidate={candidate} setCandidate={setCandidate} openModal={()=>setModal('candidate')}/>:tab==='Skills matrix'?<SkillsMatrix skillFilter={skillFilter} setSkillFilter={setSkillFilter} employees={employees} teamFilter={teamFilter} setTeamFilter={setTeamFilter} onAdd={()=>openEmployee()} onEdit={openEmployee} onRemove={(id)=>{if(window.confirm('Remove this fictional profile from the current demo session?')){setEmployees(list=>list.filter(e=>e.id!==id));notify('Demo employee removed.');}}}/>:tab==='Learning plans'?<LearningPlans employees={employees} changePlan={changePlan} changeStatus={(id,status)=>setEmployees(list=>list.map(e=>e.id===id?{...e,status}:e))} notify={notify}/>:tab==='Impact map'?<ImpactMap/>:null}
+    {tab==='Overview'?<Overview role={role} employees={employees} setTab={chooseTab} setNotice={setNotice}/>:tab==='Skills & achievements'?<SkillsAchievements skills={profile.skills} roadmapDone={roadmapDone} records={learningRecords} setRecords={setLearningRecords} notify={notify}/>:tab==='My profile'?<Profile profile={profile} setProfile={setProfile} notify={notify}/>:tab==='Career explorer'?<CareerExplorer region={region} setRegion={setRegion} country={country} setCountry={setCountry}/>:tab==='Learning roadmap'?<Roadmap done={roadmapDone} setDone={setRoadmapDone} notify={notify}/>:tab==='CV & matches'?<Graduate profile={profile} setProfile={setProfile} fileName={fileName} fileMessage={fileMessage} setFileName={setFileName} setFileMessage={setFileMessage}/>:tab==='Career Crash Test'?<CrashTest scenario={scenario} setScenario={setScenario}/>:tab==='Candidates'?<Candidates query={query} setQuery={setQuery} region={region} setRegion={setRegion} candidate={candidate} setCandidate={setCandidate} openModal={()=>setModal('candidate')}/>:tab==='Skills matrix'?<SkillsMatrix skillFilter={skillFilter} setSkillFilter={setSkillFilter} employees={employees} teamFilter={teamFilter} setTeamFilter={setTeamFilter} onAdd={()=>openEmployee()} onEdit={openEmployee} onRemove={(id)=>{if(window.confirm('Remove this fictional profile from the current demo session?')){setEmployees(list=>list.filter(e=>e.id!==id));notify('Demo employee removed.');}}}/>:tab==='Learning plans'?<LearningPlans employees={employees} changePlan={changePlan} changeStatus={(id,status)=>setEmployees(list=>list.map(e=>e.id===id?{...e,status}:e))} notify={notify}/>:tab==='Impact map'?<ImpactMap/>:null}
    </div>
-   <nav className="mobile-menu" aria-label="Workspace navigation">{navItems.slice(0,5).map(n=><button key={n} className={tab===n?'active':''} onClick={()=>chooseTab(n)} data-testid={`mobile-nav-${n.toLowerCase().replaceAll(' ','-')}`}>{sidebarIcon(n)}{n}</button>)}</nav>
+    <nav className="mobile-menu" aria-label="Workspace navigation">{navItems.map(n=><button key={n} className={tab===n?'active':''} onClick={()=>chooseTab(n)} data-testid={`mobile-nav-${n.toLowerCase().replaceAll(' ','-')}`}>{sidebarIcon(n)}{n}</button>)}</nav>
   </main>
   {modal==='employee'&&<div className="modal-backdrop" role="presentation"><form className="modal" onSubmit={saveEmployee} data-testid="form-employee"><div className="modal-head"><h2>{editing?'Edit employee':'Add demo employee'}</h2><button type="button" className="icon-btn" onClick={()=>setModal(null)} aria-label="Close"><X size={16}/></button></div><p className="panel-sub">Fictional workforce profile. Changes remain in this browser session only.</p><Field label="Name"><input className="control" value={employeeName} onChange={e=>setEmployeeName(e.target.value)} required data-testid="input-employee-name"/></Field><Field label="Role"><input className="control" value={employeeRole} onChange={e=>setEmployeeRole(e.target.value)} required data-testid="input-employee-role"/></Field><Field label="Team"><input className="control" value={employeeTeam} onChange={e=>setEmployeeTeam(e.target.value)} data-testid="input-employee-team"/></Field><Field label="Skills (comma separated)"><input className="control" value={employeeSkills} onChange={e=>setEmployeeSkills(e.target.value)} data-testid="input-employee-skills"/></Field><div className="modal-actions"><Button kind="outline" onClick={()=>setModal(null)}>Cancel</Button><Button type="submit" testId="button-save-employee">{editing?'Save changes':'Add profile'}</Button></div></form></div>}
   {modal==='candidate'&&<CandidateModal onClose={()=>setModal(null)} onSelect={(name)=>{setCandidate(name);setModal(null);chooseTab('Candidates');notify(`${name} opened in candidate discovery.`);}}/>}
   {candidate&&tab==='Candidates'&&<div className="modal-backdrop" role="presentation"><div className="modal"><div className="modal-head"><h2>{candidate}</h2><button className="icon-btn" onClick={()=>setCandidate(null)} aria-label="Close candidate detail"><X size={16}/></button></div><div className="notice">Fictional candidate profile · sample matching explanation, not a hiring recommendation.</div><div className="stat-card"><div className="stat-head">Explainable role alignment <Target size={15}/></div><div className="stat-value">86%</div><div className="stat-caption">Illustrative skills overlap, not an assessment outcome.</div></div><h3 style={{fontSize:13,marginTop:20}}>Relevant skills</h3><p className="panel-sub">Research synthesis · stakeholder communication · spreadsheet modelling</p><div className="modal-actions"><Button onClick={()=>{setCandidate(null);notify('Demo profile added to your review list.');}}>Add to review list</Button></div></div></div>}
   <Toast message={toast} onClose={()=>setToast('')}/>
+ </div>;
+}
+
+function SkillsAchievements({skills,roadmapDone,records,setRecords,notify}:{skills:string;roadmapDone:boolean[];records:LearningRecord[];setRecords:Dispatch<SetStateAction<LearningRecord[]>>;notify:(s:string)=>void}) {
+ const [title,setTitle]=useState(''); const [kind,setKind]=useState<'Course'|'Certification'|'Other'>('Course'); const [issuer,setIssuer]=useState(''); const [date,setDate]=useState(new Date().toISOString().slice(0,10)); const [formError,setFormError]=useState('');
+ const steps=['Set your direction','Build a data storytelling sample','Talk to someone in the field'];
+ const listedSkills=skills.split(',').map(s=>s.trim()).filter(Boolean);
+ const completeCourse=(course:typeof courseCatalog[number])=>{
+  if(records.some(r=>r.catalogId===course.id))return;
+  setRecords(current=>[{id:`course-${course.id}`,title:course.title,kind:'Course',issuer:'Futurique illustrative catalog',date:new Date().toISOString().slice(0,10),source:'demo',catalogId:course.id},...current]);
+  notify('Course added to your demo achievements.');
+ };
+ const submitRecord=(event:FormEvent<HTMLFormElement>)=>{
+  event.preventDefault();
+  if(!title.trim()){setFormError('Enter a course, certification or accomplishment name.');return;}
+  if(!date){setFormError('Choose a completion date.');return;}
+  setRecords(current=>[{id:`self-${Date.now()}`,title:title.trim(),kind,issuer:issuer.trim()||'Not specified',date,source:'self-reported'},...current]);
+  setTitle('');setIssuer('');setKind('Course');setFormError('');notify('Self-reported record added for this session.');
+ };
+ return <div className="skills-achievements" data-testid="page-skills-achievements">
+  <div className="notice" data-testid="status-achievements-demo">Demo only · Course examples and sample records are illustrative. Changes remain in this session. Self-entered records are self-reported and unverified; nothing here represents external verification.</div>
+  <section className="panel skill-summary-panel">
+   <div className="panel-head"><div><div className="eyebrow">Your learning profile</div><h2>Skills you’ve listed</h2><p className="panel-sub">Self-listed from your profile; completion-associated skills are not assessed or scored.</p></div><UserRound size={18} color="#16839c"/></div>
+   {listedSkills.length?<div className="achievement-skill-list" data-testid="list-listed-skills">{listedSkills.map((skill,i)=><span className="achievement-skill" key={`${skill}-${i}`} data-testid={`skill-listed-${i}`}>{skill}</span>)}</div>:<div className="empty-state" data-testid="empty-listed-skills">No skills listed yet. Add them in My profile to see them here.</div>}
+  </section>
+  <section className="panel roadmap-achievements">
+   <div className="panel-head"><div><div className="eyebrow">From your roadmap</div><h2>Completed milestones</h2><p className="panel-sub">This list follows the same completion state as your Learning roadmap.</p></div><Target size={18} color="#16839c"/></div>
+   {roadmapDone.some(Boolean)?<div className="milestone-list" data-testid="list-completed-milestones">{steps.map((step,i)=>roadmapDone[i]&&<div className="milestone-row" key={step} data-testid={`milestone-completed-${i}`}><span className="milestone-check"><Check size={14}/></span><span>{step}</span><span className="pill">Roadmap</span></div>)}</div>:<div className="empty-state" data-testid="empty-roadmap-milestones">No roadmap milestones completed yet. Mark a step complete in your Learning roadmap to see it here.</div>}
+  </section>
+  <section className="catalog-section">
+   <div className="catalog-heading"><div><div className="eyebrow">Illustrative learning catalog</div><h2 className="display">A next skill, at your pace.</h2><p>Short sample courses in AI fluency, data and effective AI use. Durations are approximate; these are not external courses or credentials.</p></div><BookOpenCheck size={23}/></div>
+   <div className="course-grid" data-testid="list-course-catalog">{courseCatalog.map((course,index)=>{const completed=records.some(r=>r.catalogId===course.id);return <article className="course-card" key={course.id} data-testid={`card-course-${course.id}`}><div className="course-card-top"><span className="course-index">0{index+1}</span><span className="course-tag">{course.skill}</span></div><h3>{course.title}</h3><p>{course.detail}</p><div className="course-meta"><span><Clock3 size={13}/>{course.duration}</span><span>Related skill: {course.skill}</span></div><button className={`small-btn ${completed?'':'primary'}`} onClick={()=>completeCourse(course)} disabled={completed} data-testid={`button-complete-course-${course.id}`}>{completed?<><Check size={13}/> Added to achievements</>:'Mark complete'}</button></article>})}</div>
+  </section>
+  <section className="panel records-panel">
+   <div className="panel-head"><div><div className="eyebrow">Your record, your context</div><h2>Courses & accomplishments</h2><p className="panel-sub">Catalog completions are demo entries. Anything you enter yourself is explicitly marked unverified.</p></div><Award size={19} color="#16839c"/></div>
+   {records.length?<div className="achievement-record-list" data-testid="list-achievement-records">{records.map(record=><article className="achievement-record" key={record.id} data-testid={`record-achievement-${record.id}`}><div className="record-icon">{record.kind==='Badge'?<Award size={17}/>:<BookOpenCheck size={17}/>}</div><div className="record-info"><strong>{record.title}</strong><span>{record.kind} · {record.issuer} · Completed {record.date}</span><span className={`record-status ${record.source==='self-reported'?'self-reported':''}`}>{record.source==='demo'?'Illustrative demo record':'Self-reported · unverified'}</span></div>{record.source==='self-reported'&&<button className="small-btn danger" onClick={()=>setRecords(current=>current.filter(item=>item.id!==record.id))} aria-label={`Remove ${record.title}`} data-testid={`button-remove-record-${record.id}`}><Trash2 size={13}/><span>Remove</span></button>}</article>)}</div>:<div className="empty-state" data-testid="empty-achievement-records">No course or accomplishment records yet. Add a catalog course or enter a completion below.</div>}
+  </section>
+  <section className="panel manual-record-panel">
+   <div className="panel-head"><div><h2>Add a completed course or accomplishment</h2><p className="panel-sub">Entries you add here are self-reported, unverified and kept only for this session.</p></div><Plus size={18} color="#16839c"/></div>
+   <form onSubmit={submitRecord} data-testid="form-self-reported-record" noValidate>
+    <div className="record-form-grid">
+     <div className="form-field"><label htmlFor="record-title">Name <span aria-hidden="true">*</span></label><input id="record-title" className="control" value={title} onChange={e=>setTitle(e.target.value)} required maxLength={100} placeholder="e.g. Intro to data analysis" data-testid="input-record-title"/></div>
+     <div className="form-field"><label htmlFor="record-kind">Record type</label><select id="record-kind" className="control" value={kind} onChange={e=>setKind(e.target.value as 'Course'|'Certification'|'Other')} data-testid="select-record-kind"><option>Course</option><option>Certification</option><option>Other</option></select></div>
+     <div className="form-field"><label htmlFor="record-issuer">Provider or issuer (optional)</label><input id="record-issuer" className="control" value={issuer} onChange={e=>setIssuer(e.target.value)} maxLength={100} placeholder="Add context if useful" data-testid="input-record-issuer"/></div>
+     <div className="form-field"><label htmlFor="record-date">Completion date</label><input id="record-date" className="control" type="date" value={date} onChange={e=>setDate(e.target.value)} required data-testid="input-record-date"/></div>
+    </div>
+    {formError&&<div className="notice warning" role="alert" data-testid="status-record-error">{formError}</div>}
+    <div className="record-submit-row"><p>Any manually entered certification is a user-provided claim, not a verified credential.</p><button className="btn btn-dark" type="submit" data-testid="button-add-self-reported-record">Add self-reported record <Plus size={14}/></button></div>
+   </form>
+  </section>
  </div>;
 }
 
