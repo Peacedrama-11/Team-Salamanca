@@ -22,7 +22,7 @@ Futurique is a hackathon prototype for students, fresh graduates, working adults
 | GitHub Repository | [Team-Salamanca](https://github.com/Peacedrama-11/Team-Salamanca) |
 | Replit Project | [Futurique](https://replit.com/@muhammadusmanvv/Futurique-Usman) |
 | RunPod Endpoint | Not used |
-| Slide Deck | [View Presentation Slides](./submission/https://github.com/Peacedrama-11/Team-Salamanca/blob/main/submission/Futurique%20%E2%80%94%20Pitch%20Deck.pdf) |
+| Slide Deck | [View Presentation Slides](./submission/Futurique-PitchDeck.pdf) |
 | Demo Video |[DemoFuturique](https://youtu.be/7zbv6RgGbJw?si=BRsdh08jJeWYzZ0t) |
 
 ## Overview
