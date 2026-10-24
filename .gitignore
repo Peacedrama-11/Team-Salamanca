@@ -56,3 +56,4 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 /generated-artifacts/
+.pythonlibs/

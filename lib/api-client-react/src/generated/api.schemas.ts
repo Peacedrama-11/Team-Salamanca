@@ -5,6 +5,164 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export interface CvUpload {
+  file: Blob | File;
+}
+
+export interface CvSkillDefinition {
+  name: string;
+  aliases: string[];
+}
+
+export type CvSkillLevel = typeof CvSkillLevel[keyof typeof CvSkillLevel];
+
+
+export const CvSkillLevel = {
+  unspecified: 'unspecified',
+  beginner: 'beginner',
+  intermediate: 'intermediate',
+  advanced: 'advanced',
+} as const;
+
+export interface CvSkill {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  name: string;
+  level: CvSkillLevel;
+}
+
+export interface CvProfile {
+  /** @maxItems 40 */
+  skills: CvSkill[];
+  /**
+     * @minimum 0
+     * @maximum 80
+     * @nullable
+     */
+  experienceYears: number | null;
+}
+
+export interface CvExtraction {
+  skills: CvSkill[];
+  /** @nullable */
+  experienceYears: number | null;
+  warnings: string[];
+}
+
+export type CvMatchEligibility = typeof CvMatchEligibility[keyof typeof CvMatchEligibility];
+
+
+export const CvMatchEligibility = {
+  meets: 'meets',
+  'below-stated': 'below-stated',
+  'above-current': 'above-current',
+  unknown: 'unknown',
+} as const;
+
+export type JobPostingProvider = typeof JobPostingProvider[keyof typeof JobPostingProvider];
+
+
+export const JobPostingProvider = {
+  ashby: 'ashby',
+  greenhouse: 'greenhouse',
+  lever: 'lever',
+} as const;
+
+export interface JobPosting {
+  /**
+     * @maxLength 30000
+     * @nullable
+     */
+  description?: string | null;
+  id: string;
+  provider: JobPostingProvider;
+  company: string;
+  title: string;
+  /** @nullable */
+  location: string | null;
+  /** @nullable */
+  employmentType: string | null;
+  /** @nullable */
+  department: string | null;
+  /** @nullable */
+  team: string | null;
+  /** @nullable */
+  isRemote: boolean | null;
+  /** @nullable */
+  workplaceType: string | null;
+  /** @nullable */
+  postedAt: string | null;
+  url: string;
+  fetchedAt: string;
+}
+
+export interface CvMatch {
+  job: JobPosting;
+  /** @nullable */
+  score: number | null;
+  matchedSkills: string[];
+  missingSkills: string[];
+  requiredSkills: string[];
+  /** @nullable */
+  experienceRequired: number | null;
+  eligibility: CvMatchEligibility;
+  evidence: string[];
+}
+
+export type JobsStatusState = typeof JobsStatusState[keyof typeof JobsStatusState];
+
+
+export const JobsStatusState = {
+  pending: 'pending',
+  ready: 'ready',
+  partial: 'partial',
+  unavailable: 'unavailable',
+} as const;
+
+export type BoardHealthState = typeof BoardHealthState[keyof typeof BoardHealthState];
+
+
+export const BoardHealthState = {
+  pending: 'pending',
+  ok: 'ok',
+  failed: 'failed',
+} as const;
+
+export interface BoardHealth {
+  provider: string;
+  company: string;
+  state: BoardHealthState;
+  /** @nullable */
+  fetchedAt: string | null;
+  count: number;
+}
+
+export interface JobsStatus {
+  state: JobsStatusState;
+  refreshing: boolean;
+  /** @nullable */
+  fetchedAt: string | null;
+  stale: boolean;
+  totalJobs: number;
+  boards: BoardHealth[];
+  coverage: string;
+  retryAfterSeconds: number;
+}
+
+export interface CvMatchResult {
+  matches: CvMatch[];
+  unscored: CvMatch[];
+  excluded: CvMatch[];
+  totalRanked: number;
+  totalUnscored: number;
+  totalExcluded: number;
+  method: string;
+  status: JobsStatus;
+  profile: CvProfile;
+}
+
 export interface JobRefreshInput {
   /** @maxLength 254 */
   email?: string;
@@ -126,78 +284,6 @@ export interface JobMatchInput {
      * @maximum 50
      */
   pageSize?: number;
-}
-
-export type JobPostingProvider = typeof JobPostingProvider[keyof typeof JobPostingProvider];
-
-
-export const JobPostingProvider = {
-  ashby: 'ashby',
-  greenhouse: 'greenhouse',
-  lever: 'lever',
-} as const;
-
-export interface JobPosting {
-  id: string;
-  provider: JobPostingProvider;
-  company: string;
-  title: string;
-  /** @nullable */
-  location: string | null;
-  /** @nullable */
-  employmentType: string | null;
-  /** @nullable */
-  department: string | null;
-  /** @nullable */
-  team: string | null;
-  /** @nullable */
-  isRemote: boolean | null;
-  /** @nullable */
-  workplaceType: string | null;
-  /** @nullable */
-  postedAt: string | null;
-  url: string;
-  fetchedAt: string;
-}
-
-export type BoardHealthState = typeof BoardHealthState[keyof typeof BoardHealthState];
-
-
-export const BoardHealthState = {
-  pending: 'pending',
-  ok: 'ok',
-  failed: 'failed',
-} as const;
-
-export interface BoardHealth {
-  provider: string;
-  company: string;
-  state: BoardHealthState;
-  /** @nullable */
-  fetchedAt: string | null;
-  count: number;
-}
-
-export type JobsStatusState = typeof JobsStatusState[keyof typeof JobsStatusState];
-
-
-export const JobsStatusState = {
-  pending: 'pending',
-  ready: 'ready',
-  partial: 'partial',
-  unavailable: 'unavailable',
-} as const;
-
-export interface JobsStatus {
-  state: JobsStatusState;
-  refreshing: boolean;
-  /** @nullable */
-  fetchedAt: string | null;
-  stale: boolean;
-  totalJobs: number;
-  boards: BoardHealth[];
-  coverage: string;
-  retryAfterSeconds: number;
 }
 
 export interface JobSearchResult {

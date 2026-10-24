@@ -8,6 +8,11 @@
 import type { JobPostingProvider } from './jobPostingProvider';
 
 export interface JobPosting {
+  /**
+     * @maxLength 30000
+     * @nullable
+     */
+  description?: string | null;
   id: string;
   provider: JobPostingProvider;
   company: string;

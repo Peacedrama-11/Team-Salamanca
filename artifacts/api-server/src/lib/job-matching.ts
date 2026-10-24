@@ -86,6 +86,7 @@ export function normalizeRows(rows: Record<string, unknown>[], provider: JobPost
       location: nullable(row.location), department: nullable(row.department), team: nullable(row.team),
       employmentType: nullable(row.employmentType), workplaceType: workplace, isRemote: remote,
       postedAt: nullable(row.publishedAt),
+      description: nullable(row.description)?.slice(0, 30_000) ?? null,
     });
   }
   return [...unique.values()];

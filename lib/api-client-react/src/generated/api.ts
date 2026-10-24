@@ -21,6 +21,11 @@ import type {
 
 import type {
   ApiError,
+  CvExtraction,
+  CvMatchResult,
+  CvProfile,
+  CvSkillDefinition,
+  CvUpload,
   HealthStatus,
   JobMatchInput,
   JobMatchResult,
@@ -57,6 +62,247 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetCvSkillsUrl = () => {
+
+
+
+
+  return `/api/workforce/cv/skills`
+}
+
+/**
+ * @summary Technical skill dictionary and aliases
+ */
+export const getCvSkills = async ( options?: Parameters<typeof customFetch>[1]): Promise<CvSkillDefinition[]> => {
+
+  return customFetch<CvSkillDefinition[]>(getGetCvSkillsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCvSkillsQueryKey = () => {
+    return [
+    `/api/workforce/cv/skills`
+    ] as const;
+    }
+
+
+export const getGetCvSkillsQueryOptions = <TData = Awaited<ReturnType<typeof getCvSkills>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCvSkills>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCvSkillsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCvSkills>>> = ({ signal }) => getCvSkills({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCvSkills>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCvSkillsQueryResult = NonNullable<Awaited<ReturnType<typeof getCvSkills>>>
+export type GetCvSkillsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Technical skill dictionary and aliases
+ */
+
+export function useGetCvSkills<TData = Awaited<ReturnType<typeof getCvSkills>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCvSkills>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCvSkillsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getExtractCvUrl = () => {
+
+
+
+
+  return `/api/workforce/cv/extract`
+}
+
+/**
+ * @summary Transiently parse an up-to-8-MB PDF or DOCX; never retain the document
+ */
+export const extractCv = async (cvUpload: CvUpload, options?: Parameters<typeof customFetch>[1]): Promise<CvExtraction> => {
+    const formData = new FormData();
+formData.append(`file`, cvUpload.file);
+
+  return customFetch<CvExtraction>(getExtractCvUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getExtractCvMutationKey = () => ['extractCv'] as const;
+
+export const getExtractCvMutationOptions = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof extractCv>>, TError,ExtractCvMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof extractCv>>, TError,ExtractCvMutationVariables, TContext> => {
+
+const mutationKey = getExtractCvMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof extractCv>>, ExtractCvMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  extractCv(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ExtractCvMutationResult = NonNullable<Awaited<ReturnType<typeof extractCv>>>
+    export type ExtractCvMutationBody = BodyType<CvUpload>
+    export type ExtractCvMutationError = ErrorType<ApiError>
+    export type ExtractCvMutationVariables = {data: BodyType<CvUpload>}
+
+    /**
+ * @summary Transiently parse an up-to-8-MB PDF or DOCX; never retain the document
+ */
+export const useExtractCv = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof extractCv>>, TError,ExtractCvMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof extractCv>>,
+        TError,
+        ExtractCvMutationVariables,
+        TContext
+      > => {
+      return useMutation(getExtractCvMutationOptions(options));
+    }
+
+export const getMatchCvUrl = () => {
+
+
+
+
+  return `/api/workforce/cv/matches`
+}
+
+/**
+ * @summary Compare confirmed skills with cached requirements without fetching jobs
+ */
+export const matchCv = async (cvProfile: CvProfile, options?: Parameters<typeof customFetch>[1]): Promise<CvMatchResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<CvMatchResult>(getMatchCvUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(cvProfile)
+  }
+);}
+
+
+
+
+
+export const getMatchCvMutationKey = () => ['matchCv'] as const;
+
+export const getMatchCvMutationOptions = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof matchCv>>, TError,MatchCvMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof matchCv>>, TError,MatchCvMutationVariables, TContext> => {
+
+const mutationKey = getMatchCvMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof matchCv>>, MatchCvMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  matchCv(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MatchCvMutationResult = NonNullable<Awaited<ReturnType<typeof matchCv>>>
+    export type MatchCvMutationBody = BodyType<CvProfile>
+    export type MatchCvMutationError = ErrorType<ApiError>
+    export type MatchCvMutationVariables = {data: BodyType<CvProfile>}
+
+    /**
+ * @summary Compare confirmed skills with cached requirements without fetching jobs
+ */
+export const useMatchCv = <TError = ErrorType<ApiError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof matchCv>>, TError,MatchCvMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof matchCv>>,
+        TError,
+        MatchCvMutationVariables,
+        TContext
+      > => {
+      return useMutation(getMatchCvMutationOptions(options));
+    }
 
 export const getHealthCheckUrl = () => {
 

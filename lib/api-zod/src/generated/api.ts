@@ -9,6 +9,178 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary Technical skill dictionary and aliases
+ */
+export const GetCvSkillsResponseItem = zod.object({
+  "name": zod.string(),
+  "aliases": zod.array(zod.string())
+})
+export const GetCvSkillsResponse = zod.array(GetCvSkillsResponseItem)
+
+
+/**
+ * @summary Transiently parse an up-to-8-MB PDF or DOCX; never retain the document
+ */
+export const ExtractCvBody = zod.object({
+  "file": zod.instanceof(Blob)
+})
+
+export const extractCvResponseSkillsItemNameMax = 80;
+
+
+
+export const ExtractCvResponse = zod.object({
+  "skills": zod.array(zod.object({
+  "name": zod.string().min(1).max(extractCvResponseSkillsItemNameMax),
+  "level": zod.enum(['unspecified', 'beginner', 'intermediate', 'advanced'])
+})),
+  "experienceYears": zod.number().nullable(),
+  "warnings": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Compare confirmed skills with cached requirements without fetching jobs
+ */
+export const matchCvBodySkillsItemNameMax = 80;
+
+export const matchCvBodySkillsMax = 40;
+
+export const matchCvBodyExperienceYearsMin = 0;
+export const matchCvBodyExperienceYearsMax = 80;
+
+
+
+export const MatchCvBody = zod.object({
+  "skills": zod.array(zod.object({
+  "name": zod.string().min(1).max(matchCvBodySkillsItemNameMax),
+  "level": zod.enum(['unspecified', 'beginner', 'intermediate', 'advanced'])
+})).max(matchCvBodySkillsMax),
+  "experienceYears": zod.number().min(matchCvBodyExperienceYearsMin).max(matchCvBodyExperienceYearsMax).nullable()
+})
+
+export const matchCvResponseMatchesItemJobDescriptionMax = 30000;
+
+export const matchCvResponseUnscoredItemJobDescriptionMax = 30000;
+
+export const matchCvResponseExcludedItemJobDescriptionMax = 30000;
+
+export const matchCvResponseProfileSkillsItemNameMax = 80;
+
+export const matchCvResponseProfileSkillsMax = 40;
+
+export const matchCvResponseProfileExperienceYearsMin = 0;
+export const matchCvResponseProfileExperienceYearsMax = 80;
+
+
+
+export const MatchCvResponse = zod.object({
+  "matches": zod.array(zod.object({
+  "job": zod.object({
+  "description": zod.string().max(matchCvResponseMatchesItemJobDescriptionMax).nullish(),
+  "id": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'lever']),
+  "company": zod.string(),
+  "title": zod.string(),
+  "location": zod.string().nullable(),
+  "employmentType": zod.string().nullable(),
+  "department": zod.string().nullable(),
+  "team": zod.string().nullable(),
+  "isRemote": zod.boolean().nullable(),
+  "workplaceType": zod.string().nullable(),
+  "postedAt": zod.string().nullable(),
+  "url": zod.string(),
+  "fetchedAt": zod.string()
+}),
+  "score": zod.number().nullable(),
+  "matchedSkills": zod.array(zod.string()),
+  "missingSkills": zod.array(zod.string()),
+  "requiredSkills": zod.array(zod.string()),
+  "experienceRequired": zod.number().nullable(),
+  "eligibility": zod.enum(['meets', 'below-stated', 'above-current', 'unknown']),
+  "evidence": zod.array(zod.string())
+})),
+  "unscored": zod.array(zod.object({
+  "job": zod.object({
+  "description": zod.string().max(matchCvResponseUnscoredItemJobDescriptionMax).nullish(),
+  "id": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'lever']),
+  "company": zod.string(),
+  "title": zod.string(),
+  "location": zod.string().nullable(),
+  "employmentType": zod.string().nullable(),
+  "department": zod.string().nullable(),
+  "team": zod.string().nullable(),
+  "isRemote": zod.boolean().nullable(),
+  "workplaceType": zod.string().nullable(),
+  "postedAt": zod.string().nullable(),
+  "url": zod.string(),
+  "fetchedAt": zod.string()
+}),
+  "score": zod.number().nullable(),
+  "matchedSkills": zod.array(zod.string()),
+  "missingSkills": zod.array(zod.string()),
+  "requiredSkills": zod.array(zod.string()),
+  "experienceRequired": zod.number().nullable(),
+  "eligibility": zod.enum(['meets', 'below-stated', 'above-current', 'unknown']),
+  "evidence": zod.array(zod.string())
+})),
+  "excluded": zod.array(zod.object({
+  "job": zod.object({
+  "description": zod.string().max(matchCvResponseExcludedItemJobDescriptionMax).nullish(),
+  "id": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'lever']),
+  "company": zod.string(),
+  "title": zod.string(),
+  "location": zod.string().nullable(),
+  "employmentType": zod.string().nullable(),
+  "department": zod.string().nullable(),
+  "team": zod.string().nullable(),
+  "isRemote": zod.boolean().nullable(),
+  "workplaceType": zod.string().nullable(),
+  "postedAt": zod.string().nullable(),
+  "url": zod.string(),
+  "fetchedAt": zod.string()
+}),
+  "score": zod.number().nullable(),
+  "matchedSkills": zod.array(zod.string()),
+  "missingSkills": zod.array(zod.string()),
+  "requiredSkills": zod.array(zod.string()),
+  "experienceRequired": zod.number().nullable(),
+  "eligibility": zod.enum(['meets', 'below-stated', 'above-current', 'unknown']),
+  "evidence": zod.array(zod.string())
+})),
+  "totalRanked": zod.number().int(),
+  "totalUnscored": zod.number().int(),
+  "totalExcluded": zod.number().int(),
+  "method": zod.string(),
+  "status": zod.object({
+  "state": zod.enum(['pending', 'ready', 'partial', 'unavailable']),
+  "refreshing": zod.boolean(),
+  "fetchedAt": zod.string().nullable(),
+  "stale": zod.boolean(),
+  "totalJobs": zod.number().int(),
+  "boards": zod.array(zod.object({
+  "provider": zod.string(),
+  "company": zod.string(),
+  "state": zod.enum(['pending', 'ok', 'failed']),
+  "fetchedAt": zod.string().nullable(),
+  "count": zod.number().int()
+})),
+  "coverage": zod.string(),
+  "retryAfterSeconds": zod.number().int()
+}),
+  "profile": zod.object({
+  "skills": zod.array(zod.object({
+  "name": zod.string().min(1).max(matchCvResponseProfileSkillsItemNameMax),
+  "level": zod.enum(['unspecified', 'beginner', 'intermediate', 'advanced'])
+})).max(matchCvResponseProfileSkillsMax),
+  "experienceYears": zod.number().min(matchCvResponseProfileExperienceYearsMin).max(matchCvResponseProfileExperienceYearsMax).nullable()
+})
+})
+
+
+/**
  * Returns server health status
  * @summary Health check
  */
@@ -93,8 +265,13 @@ export const SearchJobsBody = zod.object({
   "pageSize": zod.number().int().min(1).max(searchJobsBodyPageSizeMax).optional()
 })
 
+export const searchJobsResponseJobsItemDescriptionMax = 30000;
+
+
+
 export const SearchJobsResponse = zod.object({
   "jobs": zod.array(zod.object({
+  "description": zod.string().max(searchJobsResponseJobsItemDescriptionMax).nullish(),
   "id": zod.string(),
   "provider": zod.enum(['ashby', 'greenhouse', 'lever']),
   "company": zod.string(),
@@ -163,9 +340,14 @@ export const MatchJobsBody = zod.object({
   "pageSize": zod.number().int().min(1).max(matchJobsBodyPageSizeMax).optional()
 })
 
+export const matchJobsResponseMatchesItemJobDescriptionMax = 30000;
+
+
+
 export const MatchJobsResponse = zod.object({
   "matches": zod.array(zod.object({
   "job": zod.object({
+  "description": zod.string().max(matchJobsResponseMatchesItemJobDescriptionMax).nullish(),
   "id": zod.string(),
   "provider": zod.enum(['ashby', 'greenhouse', 'lever']),
   "company": zod.string(),

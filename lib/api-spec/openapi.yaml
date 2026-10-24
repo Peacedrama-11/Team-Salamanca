@@ -13,6 +13,80 @@ tags:
   - name: workforce
     description: Workforce data integrations
 paths:
+  /workforce/cv/skills:
+    get:
+      operationId: getCvSkills
+      tags: [workforce]
+      summary: Technical skill dictionary and aliases
+      responses:
+        "200":
+          description: Supported canonical skills
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CvSkillDefinition"
+  /workforce/cv/extract:
+    post:
+      operationId: extractCv
+      tags: [workforce]
+      summary: Transiently parse an up-to-8-MB PDF or DOCX; never retain the document
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CvUpload"
+      responses:
+        "200":
+          description: Unconfirmed extracted profile without raw CV text
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvExtraction"
+        "400":
+          description: Unsupported, unreadable or malformed document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "413":
+          description: Upload exceeds resource limits
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: Parser busy; retry shortly
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /workforce/cv/matches:
+    post:
+      operationId: matchCv
+      tags: [workforce]
+      summary: Compare confirmed skills with cached requirements without fetching jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CvProfile"
+      responses:
+        "200":
+          description: Up to ten ranked results and separate unknowns and experience exclusions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CvMatchResult"
+        "400":
+          description: Invalid profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
   /healthz:
     get:
       operationId: healthCheck
@@ -131,6 +205,118 @@ paths:
                 $ref: "#/components/schemas/ApiError"
 components:
   schemas:
+    CvUpload:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          format: binary
+    CvSkillDefinition:
+      type: object
+      required: [name, aliases]
+      properties:
+        name:
+          type: string
+        aliases:
+          type: array
+          items:
+            type: string
+    CvSkill:
+      type: object
+      required: [name, level]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+        level:
+          type: string
+          enum: [unspecified, beginner, intermediate, advanced]
+    CvProfile:
+      type: object
+      required: [skills, experienceYears]
+      properties:
+        skills:
+          type: array
+          maxItems: 40
+          items:
+            $ref: "#/components/schemas/CvSkill"
+        experienceYears:
+          type: ["number", "null"]
+          minimum: 0
+          maximum: 80
+    CvExtraction:
+      type: object
+      required: [skills, experienceYears, warnings]
+      properties:
+        skills:
+          type: array
+          items:
+            $ref: "#/components/schemas/CvSkill"
+        experienceYears:
+          type: ["number", "null"]
+        warnings:
+          type: array
+          items:
+            type: string
+    CvMatch:
+      type: object
+      required: [job, score, matchedSkills, missingSkills, requiredSkills, experienceRequired, eligibility, evidence]
+      properties:
+        job:
+          $ref: "#/components/schemas/JobPosting"
+        score:
+          type: ["number", "null"]
+        matchedSkills:
+          type: array
+          items:
+            type: string
+        missingSkills:
+          type: array
+          items:
+            type: string
+        requiredSkills:
+          type: array
+          items:
+            type: string
+        experienceRequired:
+          type: ["number", "null"]
+        eligibility:
+          type: string
+          enum: [meets, below-stated, above-current, unknown]
+        evidence:
+          type: array
+          items:
+            type: string
+    CvMatchResult:
+      type: object
+      required: [matches, unscored, excluded, totalRanked, totalUnscored, totalExcluded, method, status, profile]
+      properties:
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/CvMatch"
+        unscored:
+          type: array
+          items:
+            $ref: "#/components/schemas/CvMatch"
+        excluded:
+          type: array
+          items:
+            $ref: "#/components/schemas/CvMatch"
+        totalRanked:
+          type: integer
+        totalUnscored:
+          type: integer
+        totalExcluded:
+          type: integer
+        method:
+          type: string
+        status:
+          $ref: "#/components/schemas/JobsStatus"
+        profile:
+          $ref: "#/components/schemas/CvProfile"
     JobRefreshInput:
       type: object
       properties:
@@ -289,6 +475,9 @@ components:
       type: object
       required: [id, provider, company, title, location, employmentType, department, team, isRemote, workplaceType, postedAt, url, fetchedAt]
       properties:
+        description:
+          type: ["string", "null"]
+          maxLength: 30000
         id:
           type: string
         provider:

@@ -10,6 +10,8 @@ import importlib.util
 import json
 from pathlib import Path
 import sys
+from html.parser import HTMLParser
+from html import unescape
 
 VENDOR = Path(__file__).resolve().parents[2] / "vendor" / "job-boards"
 spec = importlib.util.spec_from_file_location("job_boards", VENDOR / "job_boards.py")
@@ -37,10 +39,67 @@ def read_boards(path=None):
     return list(dict.fromkeys(pairs))
 
 
+class DescriptionText(HTMLParser):
+    """Preserve requirement headings and bullets while dropping executable markup."""
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.parts = []
+        self.ignored = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag in {"script", "style"}:
+            self.ignored += 1
+        if tag in {"br", "p", "div", "li", "h1", "h2", "h3", "h4", "section"}:
+            self.parts.append("\n")
+
+    def handle_endtag(self, tag):
+        if tag in {"script", "style"} and self.ignored:
+            self.ignored -= 1
+        if tag in {"p", "div", "li", "h1", "h2", "h3", "h4", "section"}:
+            self.parts.append("\n")
+
+    def handle_data(self, data):
+        if not self.ignored:
+            self.parts.append(data)
+
+
+def description_text(value):
+    parser = DescriptionText()
+    parser.feed(unescape(str(value or "")[:150_000]))
+    return "\n".join(line.strip() for line in "".join(parser.parts).splitlines() if line.strip())[:30_000] or None
+
+
+def scan_with_descriptions(ats, slug):
+    # Reuse the pinned upstream network/retry/source normalizers. The upstream
+    # scan_board intentionally discards descriptions, so retain them here.
+    payload = json.loads(upstream.fetch(upstream.board_url(ats, slug, want_content=True)))
+    jobs = upstream.SOURCES[ats]["jobs"](payload)
+    if not isinstance(jobs, list):
+        raise ValueError("Invalid board payload")
+    rows = []
+    for job in jobs:
+        if not isinstance(job, dict):
+            continue
+        norm = upstream.SOURCES[ats]["normalize"](job)
+        if norm is None:
+            continue
+        norm = upstream._clean(norm)
+        if ats == "lever":
+            # Lever puts qualifications in lists, which the upstream normalizer
+            # omits from its compact search metadata.
+            norm["_description"] += "\n" + "\n".join(
+                str(section.get("text", "")) + "\n" + str(section.get("content", ""))
+                for section in job.get("lists", []) if isinstance(section, dict)
+            )
+        norm["description"] = description_text(norm.pop("_description", ""))
+        rows.append({"ats": ats, "company": slug, **norm, "matched": ""})
+    return rows
+
+
 def collect(pair):
     ats, slug = pair
     try:
-        rows = upstream.scan_board(ats, slug, None, False, "exact")
+        rows = scan_with_descriptions(ats, slug)
         return {"provider": ats, "company": slug, "ok": True, "rows": rows}
     except Exception:
         # Never propagate URLs/headers/contact addresses from upstream errors.
