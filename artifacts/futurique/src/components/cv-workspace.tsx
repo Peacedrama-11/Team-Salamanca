@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { extractCv, useGetCvSkills, useMatchCv, type CvMatch, type CvMatchResult } from '@workspace/api-client-react';
 import { ExternalLink, FileText, Pencil, Plus, Trash2, Upload, X, Check, ChevronDown } from 'lucide-react';
 import { getSessionEmail } from '../lib/session-email';
+import { uploadCvFile } from '../lib/cv-upload';
 import {
   LEVELS, LEVEL_LABEL, MAX_SKILLS, buildDictionary, canonicalName, clearCvProfile, loadCvProfile, normalizeSkills, normalizeYears, saveCvProfile,
   type Level, type ProfileSkill,
@@ -127,7 +128,7 @@ export function CvWorkspace() {
     abortRef.current?.abort(); const ac = new AbortController(); abortRef.current = ac;
     const g = ++gen.current; setExtracting(true); setExtractErr(''); setResult(null); setSaved(false); setMatchErr('');
     try {
-      const r = await extractCv({ file }, { signal: ac.signal });
+      const r = await uploadCvFile(file, ac.signal, extractCv);
       if (g !== gen.current) return;
       const found = normalizeSkills(r.skills.map((s) => ({ name: s.name, level: 'unspecified' })), dictRef.current);
       setSkills((cur) => { const prev = new Map(cur.map((s) => [s.name.toLowerCase(), s.level])); return found.map((s) => ({ name: s.name, level: prev.get(s.name.toLowerCase()) ?? 'unspecified' })); });
