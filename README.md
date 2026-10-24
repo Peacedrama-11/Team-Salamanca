@@ -9,7 +9,7 @@ Futurique is a hackathon prototype for students, fresh graduates, working adults
 | Field | Details |
 | --- | --- |
 | Team Name | Team Salamanca |
-| Team Domain | To be added |
+| Team Domain | Domain 1 |
 | SDG Track (1–17) | To be added |
 | Team Leader | To be added |
 | University | To be added |
