@@ -1,1 +1,2 @@
 - [Job data policy](job-data-policy.md) — User-selected real vacancy source, coverage rule and scraper contact fallback.
+- [Learning roadmap policy](learning-roadmap-policy.md) — User-selected paths, rule-based recommendations, and visual-only start/stop status.
