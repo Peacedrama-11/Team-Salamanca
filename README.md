@@ -10,21 +10,20 @@ Futurique is a hackathon prototype for students, fresh graduates, working adults
 | --- | --- |
 | Team Name | Team Salamanca |
 | Team Domain | Domain 1 |
-| SDG Track (1–17) | To be added |
-| Team Leader | To be added |
-| University | To be added |
-| Number of Members | To be added |
+| SDG Track (1–17) | SDG 4 & SDG 8 |
+| Team Leader | CHARUMATHI SATHIA GUNALAN |
+| University | Universti Teknologi Petronas, Universiti Teknologi Malaysia, Asia Pacific University, Xiamen University Malaysia |
+| Number of Members | 5 |
 
 ## Links
 
 | Resource | Link / Status |
 | --- | --- |
 | GitHub Repository | [Team-Salamanca](https://github.com/Peacedrama-11/Team-Salamanca) |
-| Replit Project | To be added |
-| Live Demo | To be added |
+| Replit Project | [Futurique](https://replit.com/@muhammadusmanvv/Futurique-Usman) |
 | RunPod Endpoint | Not used |
 | Slide Deck | To be added |
-| Demo Video | To be added |
+| Demo Video |[DemoFuturique](https://youtu.be/7zbv6RgGbJw?si=BRsdh08jJeWYzZ0t) |
 
 ## Overview
 
