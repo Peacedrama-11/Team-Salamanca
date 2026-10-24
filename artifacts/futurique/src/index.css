@@ -382,11 +382,11 @@ td strong { color:#1c2a40; }
 }
 .topbar { padding-right: 190px; }
 .role-pick-head { padding-right: 190px; }
-.dash-topbar { padding-right: 190px; }
+.dash-topbar { padding-right: 240px; }
 @media (max-width: 620px) {
   .language-picker { top: 8px; right: 8px; gap: 4px; padding: 4px 5px 4px 8px; font-size: 9px; }
   .language-picker select { padding: 5px 18px 5px 7px; }
   .topbar { padding-right: 175px; }
   .role-pick-head { padding-right: 175px; }
-  .dash-topbar { padding-right: 165px; }
+  .dash-topbar { padding-right: 180px; }
 }

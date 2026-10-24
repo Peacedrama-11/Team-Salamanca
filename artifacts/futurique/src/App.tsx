@@ -224,9 +224,9 @@ function SdgCards({theme='All 17 goals'}:{theme?:string}) {
 
 function NotFound() { return <main style={{minHeight:'100dvh',display:'grid',placeItems:'center',background:'#0b1424',color:'white',textAlign:'center',padding:20}}><div><div className="brand" style={{justifyContent:'center'}}><Brand/></div><h1 className="display" style={{fontSize:54}}>This path is still ahead.</h1><p style={{color:'#aebbd0'}}>We couldn’t find that Futurique demo page.</p><Link href="/" className="btn btn-primary" data-testid="link-not-found-home">Return home <ArrowRight size={14}/></Link></div></main>; }
 function App() {
- const [language,setLanguage]=useState<Language>(()=>typeof window!=='undefined'&&window.localStorage.getItem('futurique-language')==='ms'?'ms':'en');
+ const [language,setLanguage]=useState<Language>(()=>{if(typeof window==='undefined')return 'en';const saved=window.localStorage.getItem('futurique-language');return saved==='ms'||saved==='zh'?saved:'en';});
  useDocumentLanguage(language);
- useEffect(()=>{document.documentElement.lang=language;},[language]);
+ useEffect(()=>{document.documentElement.lang=language==='zh'?'zh-CN':language;},[language]);
  const updateLanguage=(next:Language)=>{window.localStorage.setItem('futurique-language',next);setLanguage(next);};
  return <><LanguageSelect language={language} onChange={updateLanguage}/><Switch><Route path="/" component={Landing}/><Route path="/auth" component={Auth}/><Route path="/onboarding" component={Onboarding}/><Route path="/dashboard/:role">{params=>{const role=params.role as Role;return roleInfo[role]?<Dashboard role={role}/>:<NotFound/>;}}</Route><Route component={NotFound}/></Switch></>;
 }
