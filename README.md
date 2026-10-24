@@ -231,8 +231,11 @@ Additional team reflections: **To be added**.
 ## Team
 
 | Name | Role | GitHub |
-| --- | --- | --- |
-| To be added | To be added | To be added |
+|CHARUMATHI A/P SATHIA GUNALAN| Team Lead/Frontend |  |
+|Muhammad Usman |Backend Developer | To be added |
+|MUHAMMAD MUQRI ISYROQ BIN ISMAIL |Pitch Demo| NA |
+|NARESWARA JAGADDHITARTHA SUSELOPUTRA |Pitch Demo | NA |
+|Carolina Natasya |Pitch Deck |NA|
 
 ## Submission Checklist
 
