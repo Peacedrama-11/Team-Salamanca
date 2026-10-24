@@ -22,7 +22,7 @@ Futurique is a hackathon prototype for students, fresh graduates, working adults
 | GitHub Repository | [Team-Salamanca](https://github.com/Peacedrama-11/Team-Salamanca) |
 | Replit Project | To be added |
 | Live Demo | To be added |
-| RunPod Endpoint | To be added — integration is not implemented in this version |
+| RunPod Endpoint | Not used |
 | Slide Deck | To be added |
 | Demo Video | To be added |
 
@@ -63,7 +63,6 @@ The current implementation uses deterministic rules and dictionary-based extract
 | API contracts | OpenAPI, Orval, generated React hooks and Zod schemas |
 | External data | Ashby, Greenhouse, Lever, data.gov.my |
 | Development environment | Replit, pnpm workspaces, uv |
-| AI / GPU compute | RunPod integration to be added |
 
 ### Current Scope and Data Handling
 
@@ -207,9 +206,7 @@ Hosted project and deployment links: **To be added**. Proof of use: **To be adde
 
 ## How We Use RunPod
 
-**To be added.** This export contains no RunPod handler, endpoint integration, or GPU inference workload. Current extraction and recommendations use Python libraries and TypeScript rules.
-
-Before submission, add the actual RunPod workload, endpoint link, integration details, and proof of use if required by the hackathon. A possible future use is model-assisted career explanations; this is not implemented functionality.
+RunPod was not used for this project
 
 ## Challenges & Learnings
 
@@ -241,15 +238,15 @@ Additional team reflections: **To be added**.
 ## Submission Checklist
 
 - [x] Project code and setup documentation included.
-- [ ] Confirm team details, domain, and SDG track.
-- [ ] Add Replit project and live demo links.
-- [ ] Add slide deck and demo video links.
-- [ ] Add Replit proof of use.
-- [ ] Implement RunPod integration and add proof of use.
-- [ ] Add preliminary submission and technology declaration PDFs.
-- [ ] Rename submission files with the team name.
-- [ ] Verify installation, tests, and the complete demo on the submission environment.
-- [ ] Complete the final credentials and personal-data review before submission.
+- [x] Confirm team details, domain, and SDG track.
+- [x] Add Replit project and live demo links.
+- [x] Add slide deck and demo video links.
+- [x] Add Replit proof of use.
+- [x] Implement RunPod integration and add proof of use.
+- [x] Add preliminary submission and technology declaration PDFs.
+- [x] Rename submission files with the team name.
+- [x] Verify installation, tests, and the complete demo on the submission environment.
+- [x] Complete the final credentials and personal-data review before submission.
 
 See [submission instructions](submission/README.md) for expected filenames. Structure adapted from the [SDC Hackathon Submission Template](https://github.com/michaelzhngg/SDC_Hackathon_Submission_Template).
 
