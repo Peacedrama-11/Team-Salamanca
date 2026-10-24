@@ -32,6 +32,11 @@ export function LearningRoadmap({ selections, setSelections }: Props) {
     setSelections(cur => addLearningPath(cur, picked));
     onOpenChange(false);
   };
+  const advanceQuestionnaire = () => {
+    if (answers[step] === null) return;
+    if (step < questions.length - 1) setStep(current => current + 1);
+    else { setShowResults(true); setPicked(null); }
+  };
   const answer = (q: number, o: number) => {
     setAnswers(cur => cur.map((a, i) => (i === q ? o : a)));
     setShowResults(false); setPicked(null);
@@ -41,7 +46,7 @@ export function LearningRoadmap({ selections, setSelections }: Props) {
   return (
     <div className="panel lr" data-testid="page-learning-roadmap">
       <div className="panel-head">
-        <div><h2>Your learning paths</h2><p className="panel-sub">Paths you choose to explore. Starting or stopping is only a session note, not progress or completion.</p></div>
+        <div><h2>Your learning paths</h2><p className="panel-sub">Saved separately for each demo email in this browser. Start and stop times show status only—not course progress or completion.</p></div>
         <button ref={opener} type="button" className="btn btn-primary" onClick={() => setOpen(true)} data-testid="button-start-learning"><Play size={14} /> Start learning</button>
       </div>
 
@@ -64,7 +69,7 @@ export function LearningRoadmap({ selections, setSelections }: Props) {
                 </div>
                 <div className="lr-item-side">
                   <span className={`pill ${sel.active ? '' : 'dark'}`} data-testid={`status-learning-${sel.pathId}`}>{sel.active ? 'Learning' : 'Stopped'}</span>
-                  <button type="button" className="small-btn" onClick={() => setSelections(cur => toggleLearningPath(cur, sel.pathId))} data-testid={`button-toggle-learning-${sel.pathId}`}>
+                  <button type="button" className={`small-btn ${sel.active ? 'stop' : 'resume'}`} onClick={() => setSelections(cur => toggleLearningPath(cur, sel.pathId))} data-testid={`button-toggle-learning-${sel.pathId}`}>
                     {sel.active ? <><Square size={11} /> Stop learning</> : <><Play size={11} /> Start learning</>}
                   </button>
                 </div>
@@ -109,12 +114,6 @@ export function LearningRoadmap({ selections, setSelections }: Props) {
                         </label>
                       ))}
                     </div>
-                    <div className="lr-nav">
-                      <button type="button" className="small-btn" disabled={step === 0} onClick={() => setStep(step - 1)} data-testid="button-question-back">Back</button>
-                      {step < questions.length - 1
-                        ? <button type="button" className="small-btn primary" disabled={answers[step] === null} onClick={() => setStep(step + 1)} data-testid="button-question-next">Next</button>
-                        : <button type="button" className="small-btn primary" disabled={!complete} onClick={() => { setShowResults(true); setPicked(null); }} data-testid="button-show-recommendations">See recommendations</button>}
-                    </div>
                   </div>
                 ) : (
                   <div>
@@ -135,8 +134,17 @@ export function LearningRoadmap({ selections, setSelections }: Props) {
             </Tabs.Root>
 
             <div className="lr-footer">
-              <span className="lr-footer-note">{picked ? `Selected: ${byId(picked)?.name}` : 'Select one path to continue.'}</span>
-              <button type="button" className="btn btn-primary" disabled={!picked} onClick={confirm} data-testid="button-confirm-start-learning"><Play size={14} /> Start learning</button>
+              <div className="lr-footer-navigation">
+                {tab === 'decide' && !showResults && step > 0 && <button type="button" className="small-btn" onClick={() => setStep(current => current - 1)} data-testid="button-question-back">Back</button>}
+                <span className="lr-footer-note">
+                  {tab === 'decide' && !showResults
+                    ? `Question ${step + 1} of ${questions.length}`
+                    : picked ? `Selected: ${byId(picked)?.name}` : 'Select one path to continue.'}
+                </span>
+              </div>
+              {tab === 'decide' && !showResults
+                ? <button type="button" className="btn btn-primary" disabled={answers[step] === null || (step === questions.length - 1 && !complete)} onClick={advanceQuestionnaire} data-testid={step < questions.length - 1 ? 'button-question-next' : 'button-show-recommendations'}>{step < questions.length - 1 ? 'Next' : 'See recommendations'} <ArrowUpRight size={14}/></button>
+                : <button type="button" className="btn btn-primary" disabled={!picked} onClick={confirm} data-testid="button-confirm-start-learning"><Play size={14} /> Start learning</button>}
             </div>
           </Dialog.Content>
         </Dialog.Portal>

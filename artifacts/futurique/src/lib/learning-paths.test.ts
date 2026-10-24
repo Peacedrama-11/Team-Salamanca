@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { addLearningPath, learningPaths, questions, rankLearningPaths, toggleLearningPath, type Answers } from './learning-paths.ts';
+import { loadLearningSelections, saveLearningSelections } from './learning-path-storage.ts';
 
 test('catalog has exactly the supplied 15 fixed, unique roadmap URLs', () => {
   const slugs = ['frontend', 'backend', 'full-stack', 'ai-engineer', 'machine-learning', 'ai-data-scientist', 'data-analyst', 'data-engineer', 'devops', 'mlops', 'cyber-security', 'ux-design', 'qa', 'android', 'game-developer'];
@@ -53,4 +54,58 @@ test('adding, stopping and restarting preserve original timestamps and avoid dup
   assert.equal(initial[0].active, true);
   assert.equal(initial[0].stoppedAt, null);
   assert.equal(addLearningPath(resumed, 'backend', restarted).length, 2);
+});
+
+test('learning selections persist separately by normalized email and reload after refresh', () => {
+  const entries = new Map<string, string>();
+  const originalWindow = globalThis.window;
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: { localStorage: {
+      getItem: (key: string) => entries.get(key) ?? null,
+      setItem: (key: string, value: string) => { entries.set(key, value); },
+    } },
+  });
+  try {
+    const selection = addLearningPath([], 'backend', '2026-10-25T04:05:06.000Z');
+    saveLearningSelections(selection, ' Person@Example.com ');
+
+    assert.deepEqual(loadLearningSelections('person@example.com'), selection);
+    assert.deepEqual(loadLearningSelections('another@example.com'), []);
+    assert.equal(entries.size, 1);
+
+    saveLearningSelections(addLearningPath([], 'frontend', '2026-10-25T04:05:06.000Z'), 'another@example.com');
+    assert.deepEqual(loadLearningSelections('another@example.com').map(item => item.pathId), ['frontend']);
+    assert.deepEqual(loadLearningSelections('PERSON@example.com'), selection);
+  } finally {
+    if (originalWindow) Object.defineProperty(globalThis, 'window', { configurable: true, value: originalWindow });
+    else Reflect.deleteProperty(globalThis, 'window');
+  }
+});
+
+test('corrupt and unknown browser records are ignored without exposing another email’s data', () => {
+  const entries = new Map<string, string>([
+    ['futurique-learning-paths:v1:person@example.com', JSON.stringify([
+      { pathId: 'missing-path', addedAt: '2026-10-25T04:05:06.000Z', startedAt: '2026-10-25T04:05:06.000Z', stoppedAt: null, active: true },
+      { pathId: 'frontend', addedAt: 'invalid', startedAt: 'invalid', stoppedAt: null, active: true },
+      { pathId: 'frontend', addedAt: '2026-10-25T04:05:06.000Z', startedAt: '2026-10-25T04:05:06.000Z', stoppedAt: null, active: true },
+      { pathId: 'frontend', addedAt: '2026-10-25T04:05:06.000Z', startedAt: '2026-10-25T04:05:06.000Z', stoppedAt: null, active: true },
+    ])],
+    ['futurique-learning-paths:v1:broken@example.com', 'not json'],
+  ]);
+  const originalWindow = globalThis.window;
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: { localStorage: {
+      getItem: (key: string) => entries.get(key) ?? null,
+      setItem: (key: string, value: string) => { entries.set(key, value); },
+    } },
+  });
+  try {
+    assert.deepEqual(loadLearningSelections('person@example.com').map(item => item.pathId), ['frontend']);
+    assert.deepEqual(loadLearningSelections('broken@example.com'), []);
+  } finally {
+    if (originalWindow) Object.defineProperty(globalThis, 'window', { configurable: true, value: originalWindow });
+    else Reflect.deleteProperty(globalThis, 'window');
+  }
 });

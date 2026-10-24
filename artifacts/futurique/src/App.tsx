@@ -5,7 +5,8 @@ import { LearningRoadmap } from './components/learning-roadmap';
 import type { LearningSelection } from './lib/learning-paths';
 import { LabourMarketPanel } from './components/workforce-data';
 import { CareerExplorerLive, GraduateMatches, JobTotalStat, JobsPreview } from './components/jobs';
-import { EMAIL_RE, FALLBACK_EMAIL, clearSessionEmail, setSessionEmail } from './lib/session-email';
+import { EMAIL_RE, FALLBACK_EMAIL, clearSessionEmail, getSessionEmail, setSessionEmail } from './lib/session-email';
+import { loadLearningSelections, saveLearningSelections } from './lib/learning-path-storage';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   ArrowRight, ArrowUpRight, Award, BarChart3, BookOpen, BookOpenCheck, BriefcaseBusiness, Check, ChevronDown,
@@ -79,7 +80,7 @@ function Dashboard({ role, language }: { role:Role; language:Language }) {
  const [employeeName,setEmployeeName]=useState(''); const [employeeRole,setEmployeeRole]=useState(''); const [employeeTeam,setEmployeeTeam]=useState(''); const [employeeSkills,setEmployeeSkills]=useState('');
  const [profile,setProfile]=useState<ProfileData>({name:role==='hr'?'Morgan Ellis':'Alex Morgan', field:'Business analytics', country:'Singapore', goal:'Build practical data and digital skills', skills:'Communication, Excel, Research'});
  const [fileName,setFileName]=useState(''); const [fileMessage,setFileMessage]=useState('');
- const [learningSelections,setLearningSelections]=useState<LearningSelection[]>([]);
+  const [learningSelections,setLearningSelections]=useState<LearningSelection[]>(() => loadLearningSelections());
   const [learningRecords,setLearningRecords]=useState<LearningRecord[]>([
     {id:'demo-ai',title:'AI at work essentials',kind:'Course',issuer:'Futurique demo catalog',date:'2025-02-12',source:'demo'},
     {id:'demo-data',title:'Data foundations',kind:'Course',issuer:'Futurique demo catalog',date:'2025-01-28',source:'demo'},
@@ -87,6 +88,7 @@ function Dashboard({ role, language }: { role:Role; language:Language }) {
   ]);
  const [scenario,setScenario]=useState<'steady'|'accelerated'>('steady');
  const [notice,setNotice]=useState('');
+  useEffect(() => { saveLearningSelections(learningSelections, getSessionEmail()); }, [learningSelections]);
   const navItems = role==='hr'?['Overview','Skills & achievements','Candidates','Skills matrix','Learning plans','Impact map']:['Overview','Skills & achievements','My profile','Career explorer','Learning roadmap',...(role==='graduate'?['CV & matches']:[]),...(role==='professional'?['Career Crash Test']:[])];
  const visibleEmployees=useMemo(()=>employees.filter(e=>(!query||`${e.name} ${e.role} ${e.team} ${e.skills.join(' ')}`.toLowerCase().includes(query.toLowerCase()))&&(skillFilter==='All skills'||e.skills.some(s=>s.toLowerCase().includes(skillFilter.toLowerCase())))),[employees,query,skillFilter]);
  const notify=(msg:string)=>{setToast(msg);window.setTimeout(()=>setToast(''),2800);};
@@ -100,7 +102,7 @@ function Dashboard({ role, language }: { role:Role; language:Language }) {
  return <div className="dashboard">
   <aside className="sidebar"><div className="side-brand"><Link href="/" data-testid="link-dashboard-home"><Brand/></Link></div><div className="sidebar-label">{roleInfo[role].label} workspace</div><nav className="side-nav">{navItems.map(item=><button key={item} onClick={()=>chooseTab(item)} className={tab===item?'active':''} data-testid={`nav-${item.toLowerCase().replaceAll(' ','-')}`}>{sidebarIcon(item)}<span>{item}</span></button>)}</nav><div className="side-bottom"><div className="side-nav"><button onClick={()=>setLocation('/onboarding')} data-testid="button-switch-role"><Settings2 size={16}/><span>Switch experience</span></button><button onClick={signOut} data-testid="button-sign-out"><LogOut size={16}/><span>Sign out</span></button></div></div></aside>
   <main className="dash-main"><header className="dash-topbar"><div className="breadcrumb">Futurique <span style={{padding:'0 8px'}}> / </span>{roleInfo[role].label} <span style={{padding:'0 8px'}}> / </span><strong style={{color:'#273951'}}>{tab}</strong></div><div className="user-chip"><div className="avatar">{role==='hr'?'ME':'AM'}</div><span>{role==='hr'?'Morgan Ellis':'Alex Morgan'}</span><button aria-label="Switch experience" onClick={()=>setLocation('/onboarding')} style={{border:0,background:'transparent',color:'#8090a4'}}><ChevronDown size={14}/></button></div></header>
-   <div className="dash-content"><div className="dash-heading"><div><div className="eyebrow">{roleInfo[role].label} workspace</div><h1 className="display">{title}</h1><p>{tab==='Overview'?roleInfo[role].intro:`Explore ${tab.toLowerCase()} with session-only demo data.`}</p></div>{role==='hr'&&tab==='Candidates'&&<Button onClick={()=>setModal('candidate')} kind="dark" testId="button-discover-candidates"><Search size={14}/> Discover candidates</Button>}</div>
+    <div className="dash-content"><div className="dash-heading"><div><div className="eyebrow">{roleInfo[role].label} workspace</div><h1 className="display">{title}</h1><p>{tab==='Overview'?roleInfo[role].intro:tab==='Learning roadmap'?'Your learning paths are saved in this browser for the demo email you entered.':`Explore ${tab.toLowerCase()} with session-only demo data.`}</p></div>{role==='hr'&&tab==='Candidates'&&<Button onClick={()=>setModal('candidate')} kind="dark" testId="button-discover-candidates"><Search size={14}/> Discover candidates</Button>}</div>
    {role==='graduate'&&tab==='CV & matches'&&<div className="notice warning" data-testid="status-cv-demo">File selection is validated in your browser; no upload, extraction or storage occurs. Job relevance below uses only the profile fields you enter, not your CV.</div>}
     {notice&&<div className="notice" role="status" data-testid="status-inline">{notice}</div>}
     {tab==='Overview'&&<LabourMarketPanel language={language}/>}

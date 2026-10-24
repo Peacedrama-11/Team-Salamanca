@@ -15,4 +15,8 @@ Start/stop learning is visual status with timestamps, not evidence of course com
 
 **Why:** The user specified this behavior as visual tracking only.
 
-**How to apply:** Preserve these distinctions when extending learning paths, recommendation logic, or achievements. Cross-session persistence and external roadmap progress synchronization were excluded from the initial selection feature, not established as permanent product restrictions.
+Store learning selections and timestamps separately for each user email.
+
+**Why:** The user explicitly asked for learning information to be stored by email.
+
+**How to apply:** The current demo uses this browser's persistent storage, keyed by normalized email. This does not provide secure account authentication or cross-device synchronization. Preserve status-versus-completion distinctions when extending learning paths, recommendation logic, or achievements.
