@@ -8,10 +8,9 @@ import {
   YAxis,
 } from "recharts";
 import {
-  useGetHeadcountLabsProviderStatus,
   useGetMalaysiaLabourMarket,
 } from "@workspace/api-client-react";
-import { Activity, BriefcaseBusiness, RefreshCw } from "lucide-react";
+import { Activity, RefreshCw } from "lucide-react";
 import type { Language } from "../localization";
 
 const SOURCE_CATALOGUE_URL = "https://data.gov.my/data-catalogue/lfs_month";
@@ -197,52 +196,6 @@ export function LabourMarketPanel({ language }: { language: Language }) {
           Open API records
         </a>
       </footer>
-    </section>
-  );
-}
-
-export function JobProviderSetup() {
-  const { data, isLoading, isError, refetch } = useGetHeadcountLabsProviderStatus();
-
-  return (
-    <section className="panel job-provider-panel" data-testid="panel-jobs-provider">
-      <div className="panel-head">
-        <div>
-          <div className="eyebrow">Job listings integration</div>
-          <h2>Headcount Labs · Malaysia</h2>
-          <p className="panel-sub">
-            Live job listings are separate from labour-force statistics and are not connected yet.
-          </p>
-        </div>
-        <span className="data-status demo">DEMO DATA</span>
-      </div>
-      {isLoading ? (
-        <p className="panel-sub" role="status">Checking job-listings provider…</p>
-      ) : isError || !data ? (
-        <div className="notice warning job-provider-notice" role="alert">
-          <span>The job-listings integration status is unavailable.</span>
-          <button className="small-btn primary" onClick={() => void refetch()} data-testid="button-retry-jobs-status">
-            <RefreshCw size={13} /> Retry
-          </button>
-        </div>
-      ) : data.integrationStatus === "credentials_required" ? (
-        <div className="notice job-provider-notice" data-testid="status-jobs-unconfigured">
-          <BriefcaseBusiness size={15} />
-          <span>
-            Current career examples remain demo data, not current vacancies. Add HEADCOUNT_LABS_API_KEY through
-            Replit Secrets, then validate the provider schema, terms and limits before connecting live listings.
-            No authenticated job-listings request has been made.
-          </span>
-        </div>
-      ) : (
-        <div className="notice job-provider-notice" data-testid="status-jobs-provider-pending">
-          <BriefcaseBusiness size={15} />
-          <span>
-            Credentials are present, but the provider API schema and live request have not been implemented or
-            verified yet. Demo examples remain separate; no authenticated request has been made.
-          </span>
-        </div>
-      )}
     </section>
   );
 }

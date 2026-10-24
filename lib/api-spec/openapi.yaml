@@ -47,19 +47,96 @@ paths:
                 $ref: "#/components/schemas/ApiError"
   /workforce/jobs/provider-status:
     get:
-      operationId: getHeadcountLabsProviderStatus
+      operationId: getJobsStatus
       tags: [workforce]
-      summary: Get the Headcount Labs jobs integration status
-      description: Reports whether the expected secret exists and whether the provider contract is integrated. Does not make an authenticated request.
+      summary: Public job-board collection health and coverage
       responses:
         "200":
           description: Jobs integration readiness
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JobProviderStatus"
+                $ref: "#/components/schemas/JobsStatus"
+  /workforce/jobs/search:
+    post:
+      operationId: searchJobs
+      tags: [workforce]
+      summary: Search cached real vacancies; starts a background refresh when needed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobSearchInput"
+      responses:
+        "200":
+          description: Paginated jobs and collection status, including pending or failed collection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobSearchResult"
+        "400":
+          description: Invalid filters or email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /workforce/jobs/matches:
+    post:
+      operationId: matchJobs
+      tags: [workforce]
+      summary: Rank real vacancies using entered profile and actual posting metadata
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobMatchInput"
+      responses:
+        "200":
+          description: Explainable metadata-based relevance, not a hiring probability
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobMatchResult"
+        "400":
+          description: Invalid profile or email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /workforce/jobs/refresh:
+    post:
+      operationId: refreshJobs
+      tags: [workforce]
+      summary: Request deduplicated rate-limited background collection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobRefreshInput"
+      responses:
+        "202":
+          description: Collection accepted or already running/cooling down
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobsStatus"
+        "400":
+          description: Invalid contact email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
   schemas:
+    JobRefreshInput:
+      type: object
+      properties:
+        email:
+          type: string
+          maxLength: 254
     HealthStatus:
       type: object
       properties:
@@ -150,15 +227,188 @@ components:
         - retrievedAt
         - units
         - observations
-    JobProviderStatus:
+    JobSearchInput:
       type: object
       properties:
-        credentialsConfigured:
-          type: boolean
-        integrationStatus:
+        email:
           type: string
-          enum: [credentials_required, provider_contract_pending]
-      required:
-        - credentialsConfigured
-        - integrationStatus
-
+          maxLength: 254
+        query:
+          type: string
+          maxLength: 150
+        location:
+          type: string
+          maxLength: 100
+        region:
+          type: string
+          enum: [all, apac, anz, remote]
+        remote:
+          type: boolean
+        employmentType:
+          type: string
+          maxLength: 100
+        page:
+          type: integer
+          minimum: 1
+          maximum: 100000
+        pageSize:
+          type: integer
+          minimum: 1
+          maximum: 50
+    JobMatchInput:
+      type: object
+      properties:
+        email:
+          type: string
+          maxLength: 254
+        skills:
+          type: array
+          maxItems: 40
+          items:
+            type: string
+            maxLength: 100
+        field:
+          type: string
+          maxLength: 200
+        goal:
+          type: string
+          maxLength: 300
+        location:
+          type: string
+          maxLength: 100
+        page:
+          type: integer
+          minimum: 1
+          maximum: 100000
+        pageSize:
+          type: integer
+          minimum: 1
+          maximum: 50
+      required: [skills]
+    JobPosting:
+      type: object
+      required: [id, provider, company, title, location, employmentType, department, team, isRemote, workplaceType, postedAt, url, fetchedAt]
+      properties:
+        id:
+          type: string
+        provider:
+          type: string
+          enum: [ashby, greenhouse, lever]
+        company:
+          type: string
+        title:
+          type: string
+        location:
+          type: ["string", "null"]
+        employmentType:
+          type: ["string", "null"]
+        department:
+          type: ["string", "null"]
+        team:
+          type: ["string", "null"]
+        isRemote:
+          type: ["boolean", "null"]
+        workplaceType:
+          type: ["string", "null"]
+        postedAt:
+          type: ["string", "null"]
+        url:
+          type: string
+        fetchedAt:
+          type: string
+    BoardHealth:
+      type: object
+      required: [provider, company, state, fetchedAt, count]
+      properties:
+        provider:
+          type: string
+        company:
+          type: string
+        state:
+          type: string
+          enum: [pending, ok, failed]
+        fetchedAt:
+          type: ["string", "null"]
+        count:
+          type: integer
+    JobsStatus:
+      type: object
+      required: [state, refreshing, fetchedAt, stale, totalJobs, boards, coverage, retryAfterSeconds]
+      properties:
+        state:
+          type: string
+          enum: [pending, ready, partial, unavailable]
+        refreshing:
+          type: boolean
+        fetchedAt:
+          type: ["string", "null"]
+        stale:
+          type: boolean
+        totalJobs:
+          type: integer
+        boards:
+          type: array
+          items:
+            $ref: "#/components/schemas/BoardHealth"
+        coverage:
+          type: string
+        retryAfterSeconds:
+          type: integer
+    JobSearchResult:
+      type: object
+      required: [jobs, total, page, pageSize, employmentTypes, status]
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobPosting"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        employmentTypes:
+          type: array
+          items:
+            type: string
+        status:
+          $ref: "#/components/schemas/JobsStatus"
+    JobMatch:
+      type: object
+      required: [job, score, evidence, missingInformation, unmatchedSkills]
+      properties:
+        job:
+          $ref: "#/components/schemas/JobPosting"
+        score:
+          type: integer
+        evidence:
+          type: array
+          items:
+            type: string
+        missingInformation:
+          type: array
+          items:
+            type: string
+        unmatchedSkills:
+          type: array
+          items:
+            type: string
+    JobMatchResult:
+      type: object
+      required: [matches, total, page, pageSize, method, status]
+      properties:
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobMatch"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        method:
+          type: string
+        status:
+          $ref: "#/components/schemas/JobsStatus"

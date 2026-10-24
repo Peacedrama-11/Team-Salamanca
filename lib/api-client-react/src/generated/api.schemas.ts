@@ -5,6 +5,11 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export interface JobRefreshInput {
+  /** @maxLength 254 */
+  email?: string;
+}
+
 export interface HealthStatus {
   status: string;
 }
@@ -64,16 +69,160 @@ export interface LabourMarketData {
   observations: LabourMarketObservation[];
 }
 
-export type JobProviderStatusIntegrationStatus = typeof JobProviderStatusIntegrationStatus[keyof typeof JobProviderStatusIntegrationStatus];
+export type JobSearchInputRegion = typeof JobSearchInputRegion[keyof typeof JobSearchInputRegion];
 
 
-export const JobProviderStatusIntegrationStatus = {
-  credentials_required: 'credentials_required',
-  provider_contract_pending: 'provider_contract_pending',
+export const JobSearchInputRegion = {
+  all: 'all',
+  apac: 'apac',
+  anz: 'anz',
+  remote: 'remote',
 } as const;
 
-export interface JobProviderStatus {
-  credentialsConfigured: boolean;
-  integrationStatus: JobProviderStatusIntegrationStatus;
+export interface JobSearchInput {
+  /** @maxLength 254 */
+  email?: string;
+  /** @maxLength 150 */
+  query?: string;
+  /** @maxLength 100 */
+  location?: string;
+  region?: JobSearchInputRegion;
+  remote?: boolean;
+  /** @maxLength 100 */
+  employmentType?: string;
+  /**
+     * @minimum 1
+     * @maximum 100000
+     */
+  page?: number;
+  /**
+     * @minimum 1
+     * @maximum 50
+     */
+  pageSize?: number;
+}
+
+export interface JobMatchInput {
+  /** @maxLength 254 */
+  email?: string;
+  /**
+     * @maxItems 40
+     * @items.maxLength 100
+     */
+  skills: string[];
+  /** @maxLength 200 */
+  field?: string;
+  /** @maxLength 300 */
+  goal?: string;
+  /** @maxLength 100 */
+  location?: string;
+  /**
+     * @minimum 1
+     * @maximum 100000
+     */
+  page?: number;
+  /**
+     * @minimum 1
+     * @maximum 50
+     */
+  pageSize?: number;
+}
+
+export type JobPostingProvider = typeof JobPostingProvider[keyof typeof JobPostingProvider];
+
+
+export const JobPostingProvider = {
+  ashby: 'ashby',
+  greenhouse: 'greenhouse',
+  lever: 'lever',
+} as const;
+
+export interface JobPosting {
+  id: string;
+  provider: JobPostingProvider;
+  company: string;
+  title: string;
+  /** @nullable */
+  location: string | null;
+  /** @nullable */
+  employmentType: string | null;
+  /** @nullable */
+  department: string | null;
+  /** @nullable */
+  team: string | null;
+  /** @nullable */
+  isRemote: boolean | null;
+  /** @nullable */
+  workplaceType: string | null;
+  /** @nullable */
+  postedAt: string | null;
+  url: string;
+  fetchedAt: string;
+}
+
+export type BoardHealthState = typeof BoardHealthState[keyof typeof BoardHealthState];
+
+
+export const BoardHealthState = {
+  pending: 'pending',
+  ok: 'ok',
+  failed: 'failed',
+} as const;
+
+export interface BoardHealth {
+  provider: string;
+  company: string;
+  state: BoardHealthState;
+  /** @nullable */
+  fetchedAt: string | null;
+  count: number;
+}
+
+export type JobsStatusState = typeof JobsStatusState[keyof typeof JobsStatusState];
+
+
+export const JobsStatusState = {
+  pending: 'pending',
+  ready: 'ready',
+  partial: 'partial',
+  unavailable: 'unavailable',
+} as const;
+
+export interface JobsStatus {
+  state: JobsStatusState;
+  refreshing: boolean;
+  /** @nullable */
+  fetchedAt: string | null;
+  stale: boolean;
+  totalJobs: number;
+  boards: BoardHealth[];
+  coverage: string;
+  retryAfterSeconds: number;
+}
+
+export interface JobSearchResult {
+  jobs: JobPosting[];
+  total: number;
+  page: number;
+  pageSize: number;
+  employmentTypes: string[];
+  status: JobsStatus;
+}
+
+export interface JobMatch {
+  job: JobPosting;
+  score: number;
+  evidence: string[];
+  missingInformation: string[];
+  unmatchedSkills: string[];
+}
+
+export interface JobMatchResult {
+  matches: JobMatch[];
+  total: number;
+  page: number;
+  pageSize: number;
+  method: string;
+  status: JobsStatus;
 }
 

@@ -28,7 +28,8 @@ A demo career development and workforce intelligence platform for navigating AI-
 
 ## Architecture decisions
 
-- First release uses session-only synthetic demo data; no database or external API is required to run the prototype.
+- Profile, HR candidate and learning data remain session-only synthetic demo data.
+- Vacancies and metadata-based career matches use the shared real job-board cache in PostgreSQL; run the API alongside the web app. See `artifacts/api-server/JOBS.md`.
 - Uploaded CVs must remain local to the active session and are not uploaded, read, or analyzed.
 
 ## Product

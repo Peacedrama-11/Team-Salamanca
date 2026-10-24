@@ -1,10 +1,8 @@
 import { Router, type IRouter } from "express";
 import {
   GetMalaysiaLabourMarketResponse,
-  GetHeadcountLabsProviderStatusResponse,
 } from "@workspace/api-zod";
 import { getMalaysiaLabourMarketData } from "../lib/dataGovMalaysia";
-import { getHeadcountLabsProviderStatus } from "../lib/headcountLabs";
 
 const router: IRouter = Router();
 
@@ -18,10 +16,6 @@ router.get("/workforce/labour-market", async (req, res): Promise<void> => {
       error: "Official Malaysia labour-force data is unavailable. Please retry.",
     });
   }
-});
-
-router.get("/workforce/jobs/provider-status", (_req, res): void => {
-  res.json(GetHeadcountLabsProviderStatusResponse.parse(getHeadcountLabsProviderStatus()));
 });
 
 export default router;

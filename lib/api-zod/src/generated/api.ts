@@ -45,12 +45,195 @@ export const GetMalaysiaLabourMarketResponse = zod.object({
 
 
 /**
- * Reports whether the expected secret exists and whether the provider contract is integrated. Does not make an authenticated request.
- * @summary Get the Headcount Labs jobs integration status
+ * @summary Public job-board collection health and coverage
  */
-export const GetHeadcountLabsProviderStatusResponse = zod.object({
-  "credentialsConfigured": zod.boolean(),
-  "integrationStatus": zod.enum(['credentials_required', 'provider_contract_pending'])
+export const GetJobsStatusResponse = zod.object({
+  "state": zod.enum(['pending', 'ready', 'partial', 'unavailable']),
+  "refreshing": zod.boolean(),
+  "fetchedAt": zod.string().nullable(),
+  "stale": zod.boolean(),
+  "totalJobs": zod.number().int(),
+  "boards": zod.array(zod.object({
+  "provider": zod.string(),
+  "company": zod.string(),
+  "state": zod.enum(['pending', 'ok', 'failed']),
+  "fetchedAt": zod.string().nullable(),
+  "count": zod.number().int()
+})),
+  "coverage": zod.string(),
+  "retryAfterSeconds": zod.number().int()
+})
+
+
+/**
+ * @summary Search cached real vacancies; starts a background refresh when needed
+ */
+export const searchJobsBodyEmailMax = 254;
+
+export const searchJobsBodyQueryMax = 150;
+
+export const searchJobsBodyLocationMax = 100;
+
+export const searchJobsBodyEmploymentTypeMax = 100;
+
+export const searchJobsBodyPageMax = 100000;
+
+export const searchJobsBodyPageSizeMax = 50;
+
+
+
+export const SearchJobsBody = zod.object({
+  "email": zod.string().max(searchJobsBodyEmailMax).optional(),
+  "query": zod.string().max(searchJobsBodyQueryMax).optional(),
+  "location": zod.string().max(searchJobsBodyLocationMax).optional(),
+  "region": zod.enum(['all', 'apac', 'anz', 'remote']).optional(),
+  "remote": zod.boolean().optional(),
+  "employmentType": zod.string().max(searchJobsBodyEmploymentTypeMax).optional(),
+  "page": zod.number().int().min(1).max(searchJobsBodyPageMax).optional(),
+  "pageSize": zod.number().int().min(1).max(searchJobsBodyPageSizeMax).optional()
+})
+
+export const SearchJobsResponse = zod.object({
+  "jobs": zod.array(zod.object({
+  "id": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'lever']),
+  "company": zod.string(),
+  "title": zod.string(),
+  "location": zod.string().nullable(),
+  "employmentType": zod.string().nullable(),
+  "department": zod.string().nullable(),
+  "team": zod.string().nullable(),
+  "isRemote": zod.boolean().nullable(),
+  "workplaceType": zod.string().nullable(),
+  "postedAt": zod.string().nullable(),
+  "url": zod.string(),
+  "fetchedAt": zod.string()
+})),
+  "total": zod.number().int(),
+  "page": zod.number().int(),
+  "pageSize": zod.number().int(),
+  "employmentTypes": zod.array(zod.string()),
+  "status": zod.object({
+  "state": zod.enum(['pending', 'ready', 'partial', 'unavailable']),
+  "refreshing": zod.boolean(),
+  "fetchedAt": zod.string().nullable(),
+  "stale": zod.boolean(),
+  "totalJobs": zod.number().int(),
+  "boards": zod.array(zod.object({
+  "provider": zod.string(),
+  "company": zod.string(),
+  "state": zod.enum(['pending', 'ok', 'failed']),
+  "fetchedAt": zod.string().nullable(),
+  "count": zod.number().int()
+})),
+  "coverage": zod.string(),
+  "retryAfterSeconds": zod.number().int()
+})
+})
+
+
+/**
+ * @summary Rank real vacancies using entered profile and actual posting metadata
+ */
+export const matchJobsBodyEmailMax = 254;
+
+export const matchJobsBodySkillsItemMax = 100;
+
+export const matchJobsBodySkillsMax = 40;
+
+export const matchJobsBodyFieldMax = 200;
+
+export const matchJobsBodyGoalMax = 300;
+
+export const matchJobsBodyLocationMax = 100;
+
+export const matchJobsBodyPageMax = 100000;
+
+export const matchJobsBodyPageSizeMax = 50;
+
+
+
+export const MatchJobsBody = zod.object({
+  "email": zod.string().max(matchJobsBodyEmailMax).optional(),
+  "skills": zod.array(zod.string().max(matchJobsBodySkillsItemMax)).max(matchJobsBodySkillsMax),
+  "field": zod.string().max(matchJobsBodyFieldMax).optional(),
+  "goal": zod.string().max(matchJobsBodyGoalMax).optional(),
+  "location": zod.string().max(matchJobsBodyLocationMax).optional(),
+  "page": zod.number().int().min(1).max(matchJobsBodyPageMax).optional(),
+  "pageSize": zod.number().int().min(1).max(matchJobsBodyPageSizeMax).optional()
+})
+
+export const MatchJobsResponse = zod.object({
+  "matches": zod.array(zod.object({
+  "job": zod.object({
+  "id": zod.string(),
+  "provider": zod.enum(['ashby', 'greenhouse', 'lever']),
+  "company": zod.string(),
+  "title": zod.string(),
+  "location": zod.string().nullable(),
+  "employmentType": zod.string().nullable(),
+  "department": zod.string().nullable(),
+  "team": zod.string().nullable(),
+  "isRemote": zod.boolean().nullable(),
+  "workplaceType": zod.string().nullable(),
+  "postedAt": zod.string().nullable(),
+  "url": zod.string(),
+  "fetchedAt": zod.string()
+}),
+  "score": zod.number().int(),
+  "evidence": zod.array(zod.string()),
+  "missingInformation": zod.array(zod.string()),
+  "unmatchedSkills": zod.array(zod.string())
+})),
+  "total": zod.number().int(),
+  "page": zod.number().int(),
+  "pageSize": zod.number().int(),
+  "method": zod.string(),
+  "status": zod.object({
+  "state": zod.enum(['pending', 'ready', 'partial', 'unavailable']),
+  "refreshing": zod.boolean(),
+  "fetchedAt": zod.string().nullable(),
+  "stale": zod.boolean(),
+  "totalJobs": zod.number().int(),
+  "boards": zod.array(zod.object({
+  "provider": zod.string(),
+  "company": zod.string(),
+  "state": zod.enum(['pending', 'ok', 'failed']),
+  "fetchedAt": zod.string().nullable(),
+  "count": zod.number().int()
+})),
+  "coverage": zod.string(),
+  "retryAfterSeconds": zod.number().int()
+})
+})
+
+
+/**
+ * @summary Request deduplicated rate-limited background collection
+ */
+export const refreshJobsBodyEmailMax = 254;
+
+
+
+export const RefreshJobsBody = zod.object({
+  "email": zod.string().max(refreshJobsBodyEmailMax).optional()
+})
+
+export const RefreshJobsResponse = zod.object({
+  "state": zod.enum(['pending', 'ready', 'partial', 'unavailable']),
+  "refreshing": zod.boolean(),
+  "fetchedAt": zod.string().nullable(),
+  "stale": zod.boolean(),
+  "totalJobs": zod.number().int(),
+  "boards": zod.array(zod.object({
+  "provider": zod.string(),
+  "company": zod.string(),
+  "state": zod.enum(['pending', 'ok', 'failed']),
+  "fetchedAt": zod.string().nullable(),
+  "count": zod.number().int()
+})),
+  "coverage": zod.string(),
+  "retryAfterSeconds": zod.number().int()
 })
 
 

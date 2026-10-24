@@ -7,9 +7,20 @@
  */
 
 export * from './apiError';
+export * from './boardHealth';
+export * from './boardHealthState';
 export * from './healthStatus';
-export * from './jobProviderStatus';
-export * from './jobProviderStatusIntegrationStatus';
+export * from './jobMatch';
+export * from './jobMatchInput';
+export * from './jobMatchResult';
+export * from './jobPosting';
+export * from './jobPostingProvider';
+export * from './jobRefreshInput';
+export * from './jobSearchInput';
+export * from './jobSearchInputRegion';
+export * from './jobSearchResult';
+export * from './jobsStatus';
+export * from './jobsStatusState';
 export * from './labourMarketData';
 export * from './labourMarketDataDatasetId';
 export * from './labourMarketDataDataType';

@@ -31,4 +31,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
+app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  // Do not log bodies, subprocess exceptions or contact addresses.
+  logger.warn("API request could not be completed");
+  res.status(503).json({ error: "Data service is temporarily unavailable. Please retry." });
+});
+
 export default app;
