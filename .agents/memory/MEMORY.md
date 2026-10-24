@@ -2,3 +2,5 @@
 - [Learning roadmap policy](learning-roadmap-policy.md) — User-selected paths, rule-based recommendations, and visual-only start/stop status.
 - [CV matching policy](cv-matching-policy.md) — Cached real vacancies, synthetic CV demos, deterministic extraction and honest unknowns.
 - [Multipart code generation](multipart-codegen.md) — Binary schemas need Blob/File declarations; keep raw files out of mutation caches.
+- [Career Crash Test policy](career-crash-test-policy.md) — Hypothetical AI adoption comparisons, not job-risk forecasts or automation probabilities.
+- [Generic JSX in previews](jsx-preview-instrumentation.md) — Use typed component aliases instead of generic JSX tags with preview metadata instrumentation.
