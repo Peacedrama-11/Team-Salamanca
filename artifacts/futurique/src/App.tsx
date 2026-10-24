@@ -1,5 +1,6 @@
-import { useMemo, useState, type Dispatch, type FormEvent, type ReactNode, type SetStateAction } from 'react';
+import { useEffect, useMemo, useState, type Dispatch, type FormEvent, type ReactNode, type SetStateAction } from 'react';
 import { Link, Route, Switch, useLocation } from 'wouter';
+import { LanguageSelect, useDocumentLanguage, type Language } from './localization';
 import {
   ArrowRight, ArrowUpRight, Award, BarChart3, BookOpen, BookOpenCheck, BriefcaseBusiness, Check, ChevronDown,
   Compass, FileText, Globe2, GraduationCap, HeartHandshake, LayoutDashboard,
@@ -223,6 +224,10 @@ function SdgCards({theme='All 17 goals'}:{theme?:string}) {
 
 function NotFound() { return <main style={{minHeight:'100dvh',display:'grid',placeItems:'center',background:'#0b1424',color:'white',textAlign:'center',padding:20}}><div><div className="brand" style={{justifyContent:'center'}}><Brand/></div><h1 className="display" style={{fontSize:54}}>This path is still ahead.</h1><p style={{color:'#aebbd0'}}>We couldn’t find that Futurique demo page.</p><Link href="/" className="btn btn-primary" data-testid="link-not-found-home">Return home <ArrowRight size={14}/></Link></div></main>; }
 function App() {
- return <Switch><Route path="/" component={Landing}/><Route path="/auth" component={Auth}/><Route path="/onboarding" component={Onboarding}/><Route path="/dashboard/:role">{params=>{const role=params.role as Role;return roleInfo[role]?<Dashboard role={role}/>:<NotFound/>;}}</Route><Route component={NotFound}/></Switch>;
+ const [language,setLanguage]=useState<Language>(()=>typeof window!=='undefined'&&window.localStorage.getItem('futurique-language')==='ms'?'ms':'en');
+ useDocumentLanguage(language);
+ useEffect(()=>{document.documentElement.lang=language;},[language]);
+ const updateLanguage=(next:Language)=>{window.localStorage.setItem('futurique-language',next);setLanguage(next);};
+ return <><LanguageSelect language={language} onChange={updateLanguage}/><Switch><Route path="/" component={Landing}/><Route path="/auth" component={Auth}/><Route path="/onboarding" component={Onboarding}/><Route path="/dashboard/:role">{params=>{const role=params.role as Role;return roleInfo[role]?<Dashboard role={role}/>:<NotFound/>;}}</Route><Route component={NotFound}/></Switch></>;
 }
 export default App;
