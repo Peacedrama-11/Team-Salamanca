@@ -12,6 +12,7 @@ import {
 } from "@workspace/api-client-react";
 import { Activity, RefreshCw } from "lucide-react";
 import type { Language } from "../localization";
+import { LoadingIndicator } from "./loading-indicator";
 
 const SOURCE_CATALOGUE_URL = "https://data.gov.my/data-catalogue/lfs_month";
 const SOURCE_API_URL =
@@ -32,7 +33,7 @@ function formatNumber(value: number, locale: string) {
 }
 
 export function LabourMarketPanel({ language }: { language: Language }) {
-  const { data, isLoading, isError, refetch } = useGetMalaysiaLabourMarket();
+  const { data, isLoading, isFetching, isError, refetch } = useGetMalaysiaLabourMarket();
   const locale = localeFor(language);
   const observations = data?.observations ?? [];
   const latest = observations.at(-1);
@@ -74,14 +75,15 @@ export function LabourMarketPanel({ language }: { language: Language }) {
       </p>
 
       {isLoading && !data ? (
-        <div className="empty-state" role="status" data-testid="status-labour-loading">
-          Loading official Malaysian labour-force data…
+        <div className="empty-state" data-testid="status-labour-loading">
+          <LoadingIndicator label="Loading official Malaysian labour-force data…" />
         </div>
       ) : isError && !data ? (
         <div className="notice warning labour-error" role="alert" data-testid="status-labour-error">
           <span>
             The official data source could not be reached. No sample figures have been substituted.
           </span>
+          {isFetching && <LoadingIndicator compact label="Retrying official data…" />}
           <button className="small-btn primary" onClick={() => void refetch()} data-testid="button-retry-labour">
             <RefreshCw size={13} /> Retry
           </button>
@@ -92,6 +94,7 @@ export function LabourMarketPanel({ language }: { language: Language }) {
         </div>
       ) : (
         <>
+          {isFetching && <LoadingIndicator compact label="Refreshing labour-market data…" />}
           {isError && (
             <div className="notice warning" role="status">
               Could not refresh official data; showing the last cached observation.

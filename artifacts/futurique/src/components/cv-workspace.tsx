@@ -3,6 +3,7 @@ import { extractCv, useGetCvSkills, useMatchCv, type CvMatch, type CvMatchResult
 import { ExternalLink, FileText, Pencil, Plus, Trash2, Upload, X, Check, ChevronDown } from 'lucide-react';
 import { getSessionEmail } from '../lib/session-email';
 import { uploadCvFile } from '../lib/cv-upload';
+import { LoadingIndicator } from './loading-indicator';
 import {
   LEVELS, LEVEL_LABEL, MAX_SKILLS, buildDictionary, canonicalName, clearCvProfile, loadCvProfile, normalizeSkills, normalizeYears, saveCvProfile,
   type Level, type ProfileSkill,
@@ -185,7 +186,7 @@ export function CvWorkspace() {
           <button type="button" className="small-btn" onClick={() => fileInput.current?.click()} disabled={extracting} data-testid="button-cv-replace-file">Replace file</button>
         </div>}
         {doneName && !file && <div className="list-row" data-testid="status-cv-done"><div className="list-main"><strong>{doneName}</strong><span>Extracted; the file itself is no longer held.</span></div><button type="button" className="small-btn" onClick={resetFile} data-testid="button-cv-dismiss-file">Dismiss</button></div>}
-        {extracting && <div className="notice" role="status" aria-busy="true" data-testid="status-cv-extracting">Reading your CV. Nothing is matched yet.</div>}
+        {extracting && <div className="notice" aria-busy="true" data-testid="status-cv-extracting"><LoadingIndicator label="Reading your CV. Nothing is matched yet." /></div>}
         {extractErr && <div className="notice warning" role="alert" data-testid="status-cv-extract-error">{extractErr} Enter your profile manually below instead.</div>}
         {warnings.length > 0 && <div className="notice" data-testid="status-cv-warnings">{warnings.map((w, i) => <div key={i}>{w}</div>)}</div>}
         {doneName && !extracting && !extractErr && skills.length > 0 && <p className="panel-sub" data-testid="status-cv-review">Review the extracted skills and experience below. Extracted skills start as Not specified; nothing is matched until you confirm.</p>}
@@ -193,6 +194,7 @@ export function CvWorkspace() {
 
       <section className="panel" style={{ marginTop: 14 }} data-testid="section-cv-skills">
         <div className="panel-head"><div><h2>2. Skills and experience</h2><p className="panel-sub">Levels are self-reported, unverified, and not used in the score. Add, edit or remove anything before confirming.</p></div></div>
+        {dictQ.isFetching && <LoadingIndicator compact label={dictQ.data ? 'Refreshing the skill dictionary…' : 'Loading the skill dictionary…'} />}
         {dictQ.isError && <div className="notice warning" role="alert" data-testid="status-cv-dict-error">The skill dictionary could not be loaded. Names are kept as typed and will not be normalised. <button type="button" className="small-btn" onClick={() => void dictQ.refetch()}>Retry</button></div>}
         {skills.length === 0
           ? <div className="empty-state" data-testid="empty-cv-skills">No skills yet. Extract them from a CV or add your first skill below.</div>
@@ -222,7 +224,7 @@ export function CvWorkspace() {
         <div className="notice" data-testid="text-cv-method">
           Score = matching required skills / total known required skills x 100. It measures skill overlap only, not hiring probability. Required skills are read from cached descriptions using the dictionary, so recognition may be incomplete. Your levels are unverified and not weighted. Jobs stating more than 2 years above your confirmed experience are set aside as above current experience; 2 years or less below is shown with a warning. Unknown experience is labelled Unknown.
         </div>
-        {matching && <div className="opportunity-row" aria-busy="true" data-testid="status-cv-matching">{[0, 1, 2].map((i) => <div key={i} className="opportunity" style={{ minHeight: 120, opacity: 0.5 }} />)}</div>}
+        {matching && <div aria-busy="true" data-testid="status-cv-matching"><LoadingIndicator label="Matching your profile to cached listings…" /><div className="opportunity-row">{[0, 1, 2].map((i) => <div key={i} className="opportunity" style={{ minHeight: 120, opacity: 0.5 }} />)}</div></div>}
         {matchErr && <div className="notice warning labour-error" role="alert" data-testid="status-cv-match-error"><span>{matchErr} Your confirmed profile is still saved.</span><button type="button" className="small-btn primary" onClick={() => void confirm()}>Retry</button></div>}
         {!result && !matching && !matchErr && <div className="empty-state" data-testid="empty-cv-results">{skills.length ? 'Confirm your profile above to see matches. Nothing is sent until you do.' : 'Add skills to begin.'}</div>}
         {result && st && (

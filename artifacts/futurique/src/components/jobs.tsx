@@ -6,6 +6,7 @@ import {
 } from '@workspace/api-client-react';
 import { ArrowRight, BriefcaseBusiness, Compass, ExternalLink, RefreshCw, Sparkles } from 'lucide-react';
 import { getSessionEmail } from '../lib/session-email';
+import { LoadingIndicator } from './loading-indicator';
 
 const POLL_MS = 4000;
 const MAX_POLLS = 30;
@@ -55,8 +56,9 @@ export function JobsStatusNotice({ status }: { status: JobsStatus }) {
   return (
     <div data-testid="status-jobs">
       {status.state === 'pending' || status.refreshing ? (
-        <div className="notice" role="status" data-testid="status-jobs-collecting">
-          Collecting listings from public job boards. This page checks again every few seconds.
+        <div className="notice" data-testid="status-jobs-collecting">
+          <LoadingIndicator label="Collecting listings from public job boards." />
+          This page checks again every few seconds.
         </div>
       ) : null}
       {status.state === 'unavailable' && (
@@ -78,7 +80,7 @@ export function JobsStatusNotice({ status }: { status: JobsStatus }) {
         </span>
         <span>{status.coverage}</span>
         <button className="small-btn" disabled={refresh.isPending || status.refreshing || status.retryAfterSeconds > 0} onClick={() => refresh.mutate()} data-testid="button-refresh-jobs">
-          <RefreshCw size={11} /> {refresh.isPending ? 'Requesting' : 'Refresh listings'}
+          <RefreshCw size={11} className={refresh.isPending ? 'animate-spin' : undefined} /> {refresh.isPending ? 'Requesting refresh…' : 'Refresh listings'}
         </button>
         {!status.refreshing && status.retryAfterSeconds > 0 && <span>Refresh available in about {status.retryAfterSeconds} seconds.</span>}
         {refresh.isError && <span role="alert">Refresh failed: {errText(refresh.error)}</span>}
@@ -112,24 +114,25 @@ export function JobCard({ job, index, prefix = 'job' }: { job: JobPosting; index
   );
 }
 
-function ErrorBox({ error, onRetry, testId }: { error: unknown; onRetry: () => void; testId: string }) {
+function ErrorBox({ error, onRetry, testId, loading = false }: { error: unknown; onRetry: () => void; testId: string; loading?: boolean }) {
   return (
     <div className="notice warning labour-error" role="alert" data-testid={testId}>
       <span>{errText(error)} No placeholder listings have been substituted.</span>
-      <button className="small-btn primary" onClick={onRetry}><RefreshCw size={13} /> Retry</button>
+      <button className="small-btn primary" onClick={onRetry} disabled={loading}><RefreshCw size={13} className={loading ? 'animate-spin' : undefined} /> {loading ? 'Retrying…' : 'Retry'}</button>
     </div>
   );
 }
 function Skeleton({ n }: { n: number }) {
-  return <div className="opportunity-row" aria-busy="true">{Array.from({ length: n }, (_, i) => <div key={i} className="opportunity" style={{ minHeight: 150, opacity: 0.5 }} />)}</div>;
+  return <div aria-busy="true"><LoadingIndicator label="Loading listings…" /><div className="opportunity-row">{Array.from({ length: n }, (_, i) => <div key={i} className="opportunity" style={{ minHeight: 150, opacity: 0.5 }} />)}</div></div>;
 }
 
 export function JobsPreview({ onOpen, openLabel = 'Explore listings' }: { onOpen?: () => void; openLabel?: string }) {
   const q = useJobSearch({ pageSize: 3 });
   return (
     <div data-testid="panel-jobs-preview">
-      {q.isLoading ? <Skeleton n={3} /> : q.isError ? <ErrorBox error={q.error} onRetry={() => void q.refetch()} testId="status-jobs-error" /> : q.data && (
+      {q.isLoading ? <Skeleton n={3} /> : q.isError ? <ErrorBox error={q.error} onRetry={() => void q.refetch()} testId="status-jobs-error" loading={q.isFetching} /> : q.data && (
         <>
+          {q.isFetching && <LoadingIndicator compact label="Updating listings…" />}
           <JobsStatusNotice status={q.data.status} />
           {q.data.jobs.length ? (
             <div className="opportunity-row">{q.data.jobs.map((j, i) => <JobCard key={j.id} job={j} index={i} prefix="preview" />)}</div>
@@ -147,7 +150,8 @@ export function JobsPreview({ onOpen, openLabel = 'Explore listings' }: { onOpen
 
 export function JobTotalStat() {
   const q = useJobSearch({ pageSize: 1 });
-  return <>{q.data ? new Intl.NumberFormat().format(q.data.total) : '—'}</>;
+  if (!q.data && q.isFetching) return <LoadingIndicator compact label="Loading job totals…" />;
+  return <>{q.data ? new Intl.NumberFormat().format(q.data.total) : '—'}{q.isFetching && <LoadingIndicator compact label="Refreshing job totals…" />}</>;
 }
 
 const REGIONS = [['all', 'All regions'], ['apac', 'Asia Pacific'], ['anz', 'Australia & NZ'], ['remote', 'Remote']] as const;
@@ -180,8 +184,9 @@ export function CareerExplorerLive() {
         <select className="control" value={type} onChange={(e) => reset(setType)(e.target.value)} aria-label="Employment type" data-testid="filter-employment-type"><option value="">Any type</option>{(q.data?.employmentTypes ?? []).map((t) => <option key={t} value={t}>{t}</option>)}</select>
         <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11 }}><input type="checkbox" checked={remote} onChange={(e) => reset(setRemote)(e.target.checked)} data-testid="check-remote" /> Remote only</label>
       </div>
-      {q.isLoading ? <Skeleton n={6} /> : q.isError ? <ErrorBox error={q.error} onRetry={() => void q.refetch()} testId="status-jobs-error" /> : q.data && (
+      {q.isLoading ? <Skeleton n={6} /> : q.isError ? <ErrorBox error={q.error} onRetry={() => void q.refetch()} testId="status-jobs-error" loading={q.isFetching} /> : q.data && (
         <>
+          {q.isFetching && <LoadingIndicator compact label="Updating listings…" />}
           <JobsStatusNotice status={q.data.status} />
           {q.data.jobs.length ? (
             <>
@@ -223,9 +228,10 @@ export function GraduateMatches({ skills, field, goal, location }: { skills: str
       <div className="panel-head"><div><h2>Listings related to your profile</h2><p className="panel-sub">Ranked using your entered skills, field, goal and location against listing titles and metadata only. Descriptions are not read, so this does not show what a role requires.</p></div><Sparkles size={17} color="#16839c" /></div>
       {list.length === 0 ? <div className="empty-state" data-testid="empty-match-skills">Add at least one skill in Profile & preferences to rank listings.</div>
         : q.isLoading ? <Skeleton n={3} />
-        : q.isError ? <ErrorBox error={q.error} onRetry={() => void q.refetch()} testId="status-matches-error" />
+        : q.isError ? <ErrorBox error={q.error} onRetry={() => void q.refetch()} testId="status-matches-error" loading={q.isFetching} />
         : q.data && (
           <>
+            {q.isFetching && <LoadingIndicator compact label="Updating matched listings…" />}
             <JobsStatusNotice status={q.data.status} />
             {q.data.matches.length === 0 ? (
               <div className="empty-state" data-testid="empty-matches">

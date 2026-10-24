@@ -214,6 +214,8 @@ button { cursor: pointer; }
 .side-nav button.active { box-shadow:inset 2px 0 #61d6ed; }
 .side-bottom { margin-top:auto; border-top:1px solid #243248; padding-top:18px; }
 .dash-main { min-width:0; }
+.loading-indicator { display:flex; align-items:center; gap:9px; color:#52647b; font-size:12px; line-height:1.5; }
+.loading-indicator.compact { display:inline-flex; margin:4px 0 9px; font-size:11px; }
 .dash-topbar { height:72px; background:#fff; border-bottom:1px solid #e2e7ee; display:flex; align-items:center; justify-content:space-between; padding:0 34px; }
 .dash-topbar .breadcrumb { color:#8490a2; font-size:11px; }
 .user-chip { display:flex; align-items:center; gap:9px; color:#34435a; font-size:11px; }
