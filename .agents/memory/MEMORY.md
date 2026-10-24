@@ -1,0 +1,1 @@
+- [Job data policy](job-data-policy.md) — User-selected real vacancy source, coverage rule and scraper contact fallback.
