@@ -203,7 +203,7 @@ After API changes, regenerate the client and schemas with `pnpm --filter @worksp
 
 The application was developed in Replit and exported as a pnpm workspace. It includes `.replit`, per-artifact service definitions, Replit preview plugins, and a PostgreSQL-backed API configuration. The web artifact builds static assets, while the API artifact builds and runs Express.
 
-Hosted project and deployment links: **To be added**. Proof of use: **To be added** in `submission/`.
+Hosted project and deployment links: **To be added**. Proof of use: **To be added**. The existing `submission/SDC2026_TeamSalamanca_Replit_POU.pdf` is an empty placeholder and must be replaced with the completed PDF.
 
 ## How We Use RunPod
 
