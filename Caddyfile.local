@@ -1,0 +1,11 @@
+# Optional local router. Run from the repository root:
+# caddy run --config Caddyfile.local --adapter caddyfile
+http://localhost:3000 {
+    handle /api/* {
+        reverse_proxy localhost:5000
+    }
+
+    handle {
+        reverse_proxy localhost:5173
+    }
+}

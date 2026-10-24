@@ -28,9 +28,9 @@ A demo career development and workforce intelligence platform for navigating AI-
 
 ## Architecture decisions
 
-- Profile, HR candidate and learning data remain session-only synthetic demo data.
+- General dashboard and HR records use synthetic demo state. Confirmed CV skills and selected learning paths persist in browser local storage, scoped by the demo email; this is not authentication.
 - Vacancies and metadata-based career matches use the shared real job-board cache in PostgreSQL; run the API alongside the web app. See `artifacts/api-server/JOBS.md`.
-- Uploaded CVs must remain local to the active session and are not uploaded, read, or analyzed.
+- The CV workspace uploads PDF/DOCX bytes to the API for temporary, in-memory dictionary-based extraction. Raw CVs are not saved to the database. Use synthetic CVs for demonstrations, then review extracted skills before matching against cached job requirements.
 
 ## Product
 

@@ -3,8 +3,10 @@
 ## Running
 
 The API imports the pinned MIT-licensed mherzog4/job-boards Python scanner.
-Python 3.13 is included in this project; no pip packages, uv, virtual environment,
-API keys or paid ATS accounts are needed. Keep `vendor/job-boards/` and
+The vacancy collector uses Python's standard library and needs no API keys or
+paid ATS accounts. The API's separate CV parser requires `pypdf` and `python-docx`;
+the API build installs the locked dependencies with `uv sync --frozen --no-dev`
+into `.pythonlibs` using Python 3.13. Keep `vendor/job-boards/` and
 `src/jobs/` in the published application alongside the built server.
 
 Development schema: `pnpm --filter @workspace/db run push`.
@@ -75,14 +77,17 @@ No fake listings substitute for empty or failed results.
 
 ## Matching limits
 
-The upstream export discards descriptions, intentionally. This integration ranks
+The general career matching integration ranks
 actual title/department/team/location metadata against supplied skills, field,
 goal and location (weights 60/20/10/10, normalized over supplied inputs).
 Scores are deterministic 0–100 metadata relevance, not probabilities. Evidence
 must match real text; absent skills are not confirmed unmet role requirements.
-Matches contain at least one actual evidence item. Full descriptions, salary,
-visa eligibility, skills assessments, CV parsing and geographic eligibility
-inference are not implemented.
+Matches contain at least one actual evidence item. The collector also retains
+normalized description text for the separate CV matching flow, which extracts
+recognized required skills and explicit experience requirements when available.
+CV PDF/DOCX parsing is implemented through the CV API. Salary verification,
+visa eligibility, proficiency assessment and geographic eligibility inference
+are not implemented. Missing description evidence remains unknown.
 
 Greenhouse's upstream date can be an update timestamp, so UI labels dates as
 source posting/update dates. Company strings are board slugs, not verified legal
