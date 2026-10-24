@@ -58,6 +58,7 @@ export function LabourMarketPanel({ language }: { language: Language }) {
         <div>
           <div className="eyebrow">Official labour-market statistics</div>
           <h2>Monthly labour-market indicators</h2>
+          <p className="panel-sub">Directly retrieved from Malaysia’s official data.gov.my API; statistics published by DOSM.</p>
           <p className="panel-sub">
             {data?.reportingPeriod
               ? <><span>Latest period: </span>{formatMonth(data.reportingPeriod, locale, { month: "long", year: "numeric" })}</>
